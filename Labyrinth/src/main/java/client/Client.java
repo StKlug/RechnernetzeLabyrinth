@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBException;
 
 import jaxb.MazeCom;
 import jaxb.MazeComType;
+import jaxb.MoveMessageType;
 import util.CurrentID;
 import util.GuiceConfig;
 import util.MazeComFactory;
@@ -78,7 +79,9 @@ public final class Client {
       currentID.update(mazeCom.getLoginReplyMessage());
     }
     else if (mazeCom.getMcType() == MazeComType.AWAITMOVE) {
-      mazeComMarshaller.marshall(artificialIntelligence.computeMove(mazeCom.getAwaitMoveMessage()));
+      MoveMessageType moveMessageType = artificialIntelligence.computeMove(mazeCom
+          .getAwaitMoveMessage());
+      mazeComMarshaller.marshall(mazeComFactory.createMoveMessage(moveMessageType));
     }
   }
 }
