@@ -1,11 +1,8 @@
 package ai;
 
-import java.util.Random;
-
 import jaxb.AwaitMoveMessageType;
+import jaxb.BoardType;
 import jaxb.MoveMessageType;
-import util.CurrentID;
-import util.Misc;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
@@ -18,29 +15,22 @@ import com.google.inject.Inject;
  */
 public final class ArtificialIntelligence {
   
-  private final Random random = new Random();
-  
   private final BoardPermuter boardPermuter;
   
-  private final CurrentID currentID;
+  private final BoardEvaluator boardEvaluator;
   
   @Inject
-  public ArtificialIntelligence(BoardPermuter boardPermuter, CurrentID currentID) {
+  public ArtificialIntelligence(BoardPermuter boardPermuter, BoardEvaluator boardEvaluator) {
     this.boardPermuter = boardPermuter;
-    this.currentID = currentID;
+    this.boardEvaluator = boardEvaluator;
   }
   
   public MoveMessageType computeMove(AwaitMoveMessageType awaitMoveMessageType) {
-    ImmutableSet<MoveMessageType> allMoveMessageTypes =
-        boardPermuter.createAllMoveMessageTypes(awaitMoveMessageType.getBoard());
+    BoardType oldBoard = awaitMoveMessageType.getBoard();
     
-    MoveMessageType moveMessageType = allMoveMessageTypes.asList().get(
-        random.nextInt(allMoveMessageTypes.size()));
+    ImmutableSet<MoveMessageType> allPossibleMoves =
+        boardPermuter.createAllPossibleMoves(oldBoard);
     
-    moveMessageType.setNewPinPos(Misc.getPositionType(awaitMoveMessageType.getBoard(),
-        currentID.getCurrentID()));
-    
-    return moveMessageType;
+    return boardEvaluator.findBest(oldBoard, allPossibleMoves);
   }
-  
 }
