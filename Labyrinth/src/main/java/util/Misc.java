@@ -3,8 +3,8 @@ package util;
 import java.util.NoSuchElementException;
 
 import jaxb.BoardType;
-import jaxb.BoardType.Row;
 import jaxb.PositionType;
+import jaxb.BoardType.Row;
 
 /**
  * Stuff that hasn't found a home yet.

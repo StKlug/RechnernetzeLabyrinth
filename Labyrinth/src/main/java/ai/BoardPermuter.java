@@ -4,9 +4,9 @@ import java.util.Set;
 
 import jaxb.BoardType;
 import jaxb.CardType;
-import jaxb.CardType.Openings;
 import jaxb.MoveMessageType;
 import jaxb.PositionType;
+import jaxb.CardType.Openings;
 import util.Misc;
 
 import com.google.common.collect.ImmutableSet;
