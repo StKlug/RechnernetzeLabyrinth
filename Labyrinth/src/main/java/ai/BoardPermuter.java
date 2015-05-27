@@ -9,18 +9,18 @@ import jaxb.MoveMessageType;
 import jaxb.PositionType;
 import util.CurrentID;
 import util.Misc;
+import util.ServerFacade;
 
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
 
 /**
  * Computes all possible MoveMessages that can be constructed from a given board. The algorithm
- * considers all 4 rotations of the shift card, as well as all 12 possible insertion points minus
- * the insertion point forbidden by the previous move.
- * <p>
- * By returning MoveMessageTypes rather than BoardTypes, it's far easier to create the response than
- * it would be if the correct MoveMessageType had to be inferred at a later point.
+ * considers all 4 rotations of the shift card, all 12 possible insertion points minus the insertion
+ * point forbidden by the previous move, as well as all reachable positions by the player pin after
+ * the shift has been applied.
  * 
  * @author Sebastian Oberhoff
  */
@@ -34,19 +34,24 @@ public final class BoardPermuter {
   }
   
   /**
-   * <b>The returned MoveMessageTypes will keep the current player position</b>
-   * 
    * @param boardType the current state of the game
-   * @return the set of all possible next states in the form of MoveMessageTypes
+   * @return a map of all possible next states, once as BoardTypes, once as the MoveMessageTypes
+   * that lead to those BoardTypes when applied to the current board
    */
-  public ImmutableSet<MoveMessageType> createAllPossibleMoves(BoardType boardType) {
+  public ImmutableBiMap<BoardType, MoveMessageType> createAllPossibleMoves(BoardType boardType) {
     Set<CardType> shiftCards = createAllPossibleShiftCards(boardType.getShiftCard());
     Set<PositionType> shiftPositions = createAllPossibleShiftPositions(boardType.getForbidden());
-    Builder<MoveMessageType> builder = ImmutableSet.builder();
+    
+    ImmutableBiMap.Builder<BoardType, MoveMessageType> builder = ImmutableBiMap.builder();
     for (CardType shiftCard : shiftCards) {
       for (PositionType shiftPosition : shiftPositions) {
-        builder.add(createMoveMessageType(shiftCard, shiftPosition,
-            Misc.getPositionType(boardType, currentID.getCurrentID())));
+        Set<PositionType> newPinPositions = createAllPossibleNewPinPositions(boardType, shiftCard,
+            shiftPosition);
+        for (PositionType newPinPos : newPinPositions) {
+          MoveMessageType nextMove = createMoveMessageType(shiftCard, shiftPosition, newPinPos);
+          BoardType nextBoard = ServerFacade.convertMessageToBoardType(boardType, nextMove);
+          builder.put(nextBoard, nextMove);
+        }
       }
     }
     return builder.build();
@@ -63,27 +68,6 @@ public final class BoardPermuter {
       builder.add(cardType);
     }
     return builder.build();
-  }
-  
-  /**
-   * Creates a copy of the card rotated clockwise once. If there are players or treasures on the
-   * card, those are also copied.
-   */
-  private CardType rotateClockWise(CardType cardType) {
-    Openings oldOpenings = cardType.getOpenings();
-    Openings rotatedOpenings = new Openings();
-    
-    rotatedOpenings.setRight(oldOpenings.isTop());
-    rotatedOpenings.setBottom(oldOpenings.isRight());
-    rotatedOpenings.setLeft(oldOpenings.isBottom());
-    rotatedOpenings.setTop(oldOpenings.isLeft());
-    
-    CardType rotatedCardType = new CardType();
-    rotatedCardType.setOpenings(rotatedOpenings);
-    // redundant? I don't think there can be players on the shift card
-    rotatedCardType.setPin(cardType.getPin());
-    rotatedCardType.setTreasure(cardType.getTreasure());
-    return rotatedCardType;
   }
   
   /**
@@ -106,6 +90,39 @@ public final class BoardPermuter {
       }
     }
     return builder.build();
+  }
+  
+  /**
+   * @return the set of of positions that can be reached by our player pin after applying the shift
+   */
+  private ImmutableSet<PositionType> createAllPossibleNewPinPositions(BoardType boardType,
+      CardType shiftCard, PositionType shiftPosition) {
+    PositionType preShiftPosition = ServerFacade.findPlayer(boardType, currentID.getCurrentID());
+    MoveMessageType shiftMessage = createMoveMessageType(shiftCard, shiftPosition, preShiftPosition);
+    BoardType shiftBoard = ServerFacade.convertMessageToBoardType(boardType, shiftMessage);
+    PositionType postShiftPosition = ServerFacade.findPlayer(shiftBoard, currentID.getCurrentID());
+    return ServerFacade.computeReachablePositions(shiftBoard, postShiftPosition);
+  }
+  
+  /**
+   * Creates a copy of the card rotated clockwise once. If there are players or treasures on the
+   * card, those are also copied.
+   */
+  private CardType rotateClockWise(CardType cardType) {
+    Openings oldOpenings = cardType.getOpenings();
+    Openings rotatedOpenings = new Openings();
+    
+    rotatedOpenings.setRight(oldOpenings.isTop());
+    rotatedOpenings.setBottom(oldOpenings.isRight());
+    rotatedOpenings.setLeft(oldOpenings.isBottom());
+    rotatedOpenings.setTop(oldOpenings.isLeft());
+    
+    CardType rotatedCardType = new CardType();
+    rotatedCardType.setOpenings(rotatedOpenings);
+    // redundant? I don't think there can be players on the shift card
+    rotatedCardType.setPin(cardType.getPin());
+    rotatedCardType.setTreasure(cardType.getTreasure());
+    return rotatedCardType;
   }
   
   private boolean isAllowed(PositionType forbidden, PositionType shiftPosition) {

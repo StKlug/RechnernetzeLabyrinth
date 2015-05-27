@@ -2,13 +2,18 @@ package ai;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
 import java.util.Random;
 
+import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
-import jaxb.MoveMessageType;
-import server.Board;
+import jaxb.PositionType;
+import jaxb.TreasureType;
+import util.CurrentID;
+import util.ServerFacade;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 
 /**
  * Class for determining the best possible board from a set of boards.
@@ -17,37 +22,55 @@ import com.google.common.collect.ImmutableSet;
  */
 public class BoardEvaluator {
   
+  private final CurrentID currentID;
+  
   private final Random random = new Random();
   
+  @Inject
+  public BoardEvaluator(CurrentID currentID) {
+    this.currentID = currentID;
+  }
+  
   /**
-   * @return the board with the highest value according the an implementation specific metric
+   * @return the MoveMessageType with the highest value when applied to a given board according to
+   * an implementation specific metric
    */
-  public MoveMessageType findBest(BoardType boardType,
-      ImmutableSet<MoveMessageType> moveMessageTypes) {
-    MoveMessageType bestMove = null;
+  public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType,
+      ImmutableSet<BoardType> possibleBoardTypes) {
+    BoardType bestBoard = null;
     int bestScore = Integer.MIN_VALUE;
-    for (MoveMessageType moveMessageType : moveMessageTypes) {
-      int score = evaluate(convertMessageToBoardType(boardType, moveMessageType));
+    
+    for (BoardType possibleBoardType : possibleBoardTypes) {
+      int score = evaluate(possibleBoardType, awaitMoveMessageType.getTreasure());
       if (bestScore < score) {
-        bestMove = moveMessageType;
+        bestBoard = possibleBoardType;
         bestScore = score;
       }
     }
-    checkNotNull(bestMove);
-    return bestMove;
+    checkNotNull(bestBoard);
+    System.out.print("Value: " + bestScore + " ");
+    return bestBoard;
   }
   
-  /**
-   * Applies a MoveMessageType to a BoardType and returns the resulting BoardType. This operation
-   * doesn't change the old board.
-   */
-  private BoardType convertMessageToBoardType(BoardType oldBoard, MoveMessageType moveMessageType) {
-    Board board = new Board(oldBoard);
-    board.proceedShift(moveMessageType);
-    return board;
+  private int evaluate(BoardType boardType, TreasureType treasureType) {
+    return random.nextInt(100) + isStandingOnTreasure(treasureType, boardType)
+        + (int) (500. / 1 + distanceToTreasure(treasureType, boardType));
   }
   
-  private int evaluate(BoardType boardType) {
-    return random.nextInt(100);
+  private int isStandingOnTreasure(TreasureType treasureType, BoardType boardType) {
+    return distanceToTreasure(treasureType, boardType) == 0 ? 10000 : 0;
+  }
+  
+  private int distanceToTreasure(TreasureType treasureType, BoardType boardType) {
+    PositionType playerPosition = ServerFacade.findPlayer(boardType, currentID.getCurrentID());
+    Optional<PositionType> treasurePosition = ServerFacade.findTreasure(boardType, treasureType);
+    if (!treasurePosition.isPresent()) {
+      return Integer.MAX_VALUE;
+    }
+    else {
+      int rowDistance = Math.abs(playerPosition.getRow() - treasurePosition.get().getRow());
+      int columnDistance = Math.abs(playerPosition.getCol() - treasurePosition.get().getCol());
+      return rowDistance + columnDistance;
+    }
   }
 }

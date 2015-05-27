@@ -3,8 +3,9 @@ package ai;
 import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import jaxb.MoveMessageType;
+import jaxb.PositionType;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.Inject;
 
 /**
@@ -26,11 +27,18 @@ public final class ArtificialIntelligence {
   }
   
   public MoveMessageType computeMove(AwaitMoveMessageType awaitMoveMessageType) {
-    BoardType oldBoard = awaitMoveMessageType.getBoard();
-    
-    ImmutableSet<MoveMessageType> allPossibleMoves =
-        boardPermuter.createAllPossibleMoves(oldBoard);
-    
-    return boardEvaluator.findBest(oldBoard, allPossibleMoves);
+    ImmutableBiMap<BoardType, MoveMessageType> nextStates = boardPermuter
+        .createAllPossibleMoves(awaitMoveMessageType.getBoard());
+    BoardType bestBoard = boardEvaluator.findBest(awaitMoveMessageType, nextStates.keySet());
+    MoveMessageType bestMove = nextStates.get(bestBoard);
+    log(bestMove);
+    return bestMove;
+  }
+  
+  private void log(MoveMessageType bestMove) {
+    PositionType shiftPosition = bestMove.getShiftPosition();
+    PositionType newPinPos = bestMove.getNewPinPos();
+    System.out.println("Shift: (" + shiftPosition.getRow() + ", " + shiftPosition.getCol() + ") "
+        + "Player Position: (" + newPinPos.getRow() + ", " + newPinPos.getCol() + ")");
   }
 }
