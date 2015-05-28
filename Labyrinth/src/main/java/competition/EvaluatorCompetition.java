@@ -2,6 +2,8 @@ package competition;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +32,7 @@ import com.google.inject.Injector;
  */
 public final class EvaluatorCompetition<T extends BoardEvaluator> {
   
-  private final List<T> boardEvaluators;
+  private final List<T> boardEvaluators = new ArrayList<>();
   
   private final ExecutorService executorService = Executors.newCachedThreadPool();
   
@@ -38,10 +40,10 @@ public final class EvaluatorCompetition<T extends BoardEvaluator> {
    * @param boardEvaluators the list of boardEvaluators that are supposed to compete against each
    * other. The number of BoardEvaluators must be between 1 and 4.
    */
-  public EvaluatorCompetition(List<T> boardEvaluators) {
+  public EvaluatorCompetition(Collection<T> boardEvaluators) {
     Preconditions.checkArgument(0 < boardEvaluators.size() && boardEvaluators.size() <= 4,
         "Only 1-4 Evaluators may compete.");
-    this.boardEvaluators = boardEvaluators;
+    this.boardEvaluators.addAll(boardEvaluators);
   }
   
   /**
@@ -52,6 +54,17 @@ public final class EvaluatorCompetition<T extends BoardEvaluator> {
     checkArgument(boardEvaluators.contains(oldEvaluator), "The old evaluator wasn't present");
     boardEvaluators.remove(oldEvaluator);
     boardEvaluators.add(newEvaluator);
+  }
+  
+  /**
+   * @param boardEvaluators the new boardEvaluators to replace any previous evaluators. The number
+   * of BoardEvaluators must be between 1 and 4.
+   */
+  public void replaceAllEvaluators(Collection<T> boardEvaluators) {
+    Preconditions.checkArgument(0 < boardEvaluators.size() && boardEvaluators.size() <= 4,
+        "Only 1-4 Evaluators may compete.");
+    this.boardEvaluators.clear();
+    this.boardEvaluators.addAll(boardEvaluators);
   }
   
   /**
