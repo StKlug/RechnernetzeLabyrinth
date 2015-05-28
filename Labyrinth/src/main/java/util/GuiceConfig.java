@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import jaxb.MazeCom;
+import ai.BoardEvaluator;
 
 import com.google.inject.AbstractModule;
 
@@ -21,7 +22,10 @@ public final class GuiceConfig extends AbstractModule {
   
   private final JAXBContext jaxbContext;
   
-  public GuiceConfig() {
+  private final BoardEvaluator boardEvaluator;
+  
+  public GuiceConfig(BoardEvaluator boardEvaluator) {
+    this.boardEvaluator = boardEvaluator;
     try {
       server = new Socket((String) null, 5123); // see config.Settings.PORT
       jaxbContext = JAXBContext.newInstance(MazeCom.class);
@@ -33,6 +37,7 @@ public final class GuiceConfig extends AbstractModule {
   
   @Override
   public void configure() {
+    bind(BoardEvaluator.class).toInstance(boardEvaluator);
     bind(Socket.class).toInstance(server);
     bind(JAXBContext.class).toInstance(jaxbContext);
   }

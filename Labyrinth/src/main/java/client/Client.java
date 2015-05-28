@@ -12,6 +12,7 @@ import util.CurrentID;
 import util.GuiceConfig;
 import util.MazeComFactory;
 import ai.ArtificialIntelligence;
+import ai.StandardBoardEvaluator;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -24,6 +25,12 @@ import com.google.inject.Injector;
  * @author Sebastian Oberhoff
  */
 public final class Client {
+  
+  private static enum Status {
+    RUNNING, LOST, WON;
+  }
+  
+  private Status status = Status.RUNNING;
   
   private final MazeComUnmarshaller mazeComUnmarshaller;
   
@@ -49,24 +56,17 @@ public final class Client {
   }
   
   /**
-   * Central entry point to the application. Performs Guice dependency injection bootstrapping, then
-   * sends the program into the run-loop.
-   */
-  public static void main(String[] args) throws JAXBException, UnknownHostException, IOException {
-    Injector injector = Guice.createInjector(new GuiceConfig());
-    Client client = injector.getInstance(Client.class);
-    client.run();
-  }
-  
-  /**
    * Logs into the server, then keeps unmarshalling new incoming messages.
+   * 
+   * @return true if the client won the game
    */
-  private void run() {
+  public boolean play() {
     mazeComMarshaller.marshall(mazeComFactory.createLoginMessage("Ameisen"));
-    while (true) {
+    while (status == Status.RUNNING) {
       MazeCom mazeCom = mazeComUnmarshaller.unmarshall();
       dispatch(mazeCom);
     }
+    return status == Status.WON;
   }
   
   /**
@@ -75,7 +75,18 @@ public final class Client {
    * @param mazeCom the MazeCom sent from the server
    */
   private void dispatch(MazeCom mazeCom) {
-    if (mazeCom.getMcType() == MazeComType.LOGINREPLY) {
+    if (mazeCom.getMcType() == MazeComType.WIN) {
+      if (mazeCom.getWinMessage().getWinner().getId() == currentID.getCurrentID()) {
+        status = Status.WON;
+      }
+      else {
+        status = Status.LOST;
+      }
+    }
+    else if (mazeCom.getMcType() == MazeComType.DISCONNECT) {
+      status = Status.LOST;
+    }
+    else if (mazeCom.getMcType() == MazeComType.LOGINREPLY) {
       currentID.update(mazeCom.getLoginReplyMessage());
     }
     else if (mazeCom.getMcType() == MazeComType.AWAITMOVE) {
@@ -83,5 +94,14 @@ public final class Client {
           .getAwaitMoveMessage());
       mazeComMarshaller.marshall(mazeComFactory.createMoveMessage(moveMessageType));
     }
+  }
+  
+  /**
+   * Central entry point to the application. Performs Guice dependency injection bootstrapping, then
+   * sends the program into the run-loop.
+   */
+  public static void main(String[] args) throws JAXBException, UnknownHostException, IOException {
+    Injector injector = Guice.createInjector(new GuiceConfig(new StandardBoardEvaluator()));
+    injector.getInstance(Client.class).play();
   }
 }

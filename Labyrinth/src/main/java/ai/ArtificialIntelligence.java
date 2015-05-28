@@ -4,6 +4,7 @@ import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import jaxb.MoveMessageType;
 import jaxb.PositionType;
+import util.CurrentID;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.Inject;
@@ -20,16 +21,23 @@ public final class ArtificialIntelligence {
   
   private final BoardEvaluator boardEvaluator;
   
+  private final CurrentID currentID;
+  
   @Inject
-  public ArtificialIntelligence(BoardPermuter boardPermuter, BoardEvaluator boardEvaluator) {
+  public ArtificialIntelligence(
+      BoardPermuter boardPermuter,
+      BoardEvaluator boardEvaluator,
+      CurrentID currentID) {
     this.boardPermuter = boardPermuter;
     this.boardEvaluator = boardEvaluator;
+    this.currentID = currentID;
   }
   
   public MoveMessageType computeMove(AwaitMoveMessageType awaitMoveMessageType) {
-    ImmutableBiMap<BoardType, MoveMessageType> nextStates = boardPermuter
-        .createAllPossibleMoves(awaitMoveMessageType.getBoard());
-    BoardType bestBoard = boardEvaluator.findBest(awaitMoveMessageType, nextStates.keySet());
+    ImmutableBiMap<BoardType, MoveMessageType> nextStates =
+        boardPermuter.createAllPossibleMoves(awaitMoveMessageType.getBoard());
+    BoardType bestBoard =
+        boardEvaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
     MoveMessageType bestMove = nextStates.get(bestBoard);
     log(bestMove);
     return bestMove;

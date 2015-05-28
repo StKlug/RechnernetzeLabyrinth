@@ -1,6 +1,5 @@
 package util;
 
-
 import jaxb.PositionType;
 
 /**
@@ -19,5 +18,15 @@ public final class Misc {
     positionType.setRow(rowIndex);
     positionType.setCol(columnIndex);
     return positionType;
+  }
+  
+  public static int computeDistance(PositionType firstPosition, PositionType secondPosition) {
+    int rowDistance = Math.abs(firstPosition.getRow() - secondPosition.getRow());
+    int columnDistance = Math.abs(firstPosition.getCol() - secondPosition.getCol());
+    return rowDistance + columnDistance;
+  }
+  
+  public static String printPosition(PositionType positionType) {
+    return "(" + positionType.getRow() + ", " + positionType.getCol() + ")";
   }
 }

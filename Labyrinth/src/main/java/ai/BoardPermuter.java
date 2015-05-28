@@ -34,22 +34,23 @@ public final class BoardPermuter {
   }
   
   /**
-   * @param boardType the current state of the game
+   * @param currentBoard the current state of the game
    * @return a map of all possible next states, once as BoardTypes, once as the MoveMessageTypes
    * that lead to those BoardTypes when applied to the current board
    */
-  public ImmutableBiMap<BoardType, MoveMessageType> createAllPossibleMoves(BoardType boardType) {
-    Set<CardType> shiftCards = createAllPossibleShiftCards(boardType.getShiftCard());
-    Set<PositionType> shiftPositions = createAllPossibleShiftPositions(boardType.getForbidden());
+  public ImmutableBiMap<BoardType, MoveMessageType> createAllPossibleMoves(BoardType currentBoard) {
+    Set<CardType> shiftCards = createAllPossibleShiftCards(currentBoard.getShiftCard());
+    Set<PositionType> shiftPositions = createAllPossibleShiftPositions(currentBoard.getForbidden());
     
     ImmutableBiMap.Builder<BoardType, MoveMessageType> builder = ImmutableBiMap.builder();
     for (CardType shiftCard : shiftCards) {
       for (PositionType shiftPosition : shiftPositions) {
-        Set<PositionType> newPinPositions = createAllPossibleNewPinPositions(boardType, shiftCard,
-            shiftPosition);
+        Set<PositionType> newPinPositions = createAllPossibleNewPinPositions(currentBoard,
+            shiftCard, shiftPosition);
         for (PositionType newPinPos : newPinPositions) {
           MoveMessageType nextMove = createMoveMessageType(shiftCard, shiftPosition, newPinPos);
-          BoardType nextBoard = ServerFacade.convertMessageToBoardType(boardType, nextMove);
+          BoardType nextBoard = ServerFacade.applyMessageToBoard(currentBoard, nextMove,
+              currentID.getCurrentID());
           builder.put(nextBoard, nextMove);
         }
       }
@@ -95,13 +96,11 @@ public final class BoardPermuter {
   /**
    * @return the set of of positions that can be reached by our player pin after applying the shift
    */
-  private ImmutableSet<PositionType> createAllPossibleNewPinPositions(BoardType boardType,
+  private ImmutableSet<PositionType> createAllPossibleNewPinPositions(BoardType currentBoard,
       CardType shiftCard, PositionType shiftPosition) {
-    PositionType preShiftPosition = ServerFacade.findPlayer(boardType, currentID.getCurrentID());
-    MoveMessageType shiftMessage = createMoveMessageType(shiftCard, shiftPosition, preShiftPosition);
-    BoardType shiftBoard = ServerFacade.convertMessageToBoardType(boardType, shiftMessage);
-    PositionType postShiftPosition = ServerFacade.findPlayer(shiftBoard, currentID.getCurrentID());
-    return ServerFacade.computeReachablePositions(shiftBoard, postShiftPosition);
+    BoardType nextBoard = ServerFacade.applyShiftToBoard(currentBoard, shiftCard, shiftPosition);
+    PositionType postShiftPosition = ServerFacade.findPlayer(nextBoard, currentID.getCurrentID());
+    return ServerFacade.computeReachablePositions(nextBoard, postShiftPosition);
   }
   
   /**
