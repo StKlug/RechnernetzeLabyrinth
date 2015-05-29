@@ -1,5 +1,7 @@
 package client;
 
+import guiceconfigs.StandardClientConfig;
+
 import java.io.IOException;
 import java.net.UnknownHostException;
 
@@ -9,10 +11,8 @@ import jaxb.MazeCom;
 import jaxb.MazeComType;
 import jaxb.MoveMessageType;
 import util.CurrentID;
-import util.GuiceConfig;
 import util.MazeComFactory;
 import ai.ArtificialIntelligence;
-import ai.StandardBoardEvaluator;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -30,7 +30,7 @@ public final class Client {
     RUNNING, LOST, WON;
   }
   
-  private Status status = Status.RUNNING;
+  private Status status;
   
   private final MazeComUnmarshaller mazeComUnmarshaller;
   
@@ -61,6 +61,7 @@ public final class Client {
    * @return true if the client won the game
    */
   public boolean play() {
+    status = Status.RUNNING;
     mazeComMarshaller.marshall(mazeComFactory.createLoginMessage("Ameisen"));
     while (status == Status.RUNNING) {
       MazeCom mazeCom = mazeComUnmarshaller.unmarshall();
@@ -101,7 +102,7 @@ public final class Client {
    * sends the program into the run-loop.
    */
   public static void main(String[] args) throws JAXBException, UnknownHostException, IOException {
-    Injector injector = Guice.createInjector(new GuiceConfig(new StandardBoardEvaluator()));
+    Injector injector = Guice.createInjector(new StandardClientConfig());
     injector.getInstance(Client.class).play();
   }
 }

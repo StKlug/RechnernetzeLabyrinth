@@ -1,25 +1,17 @@
 package competition;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import guiceconfigs.CompetitionManagerConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import server.Game;
-import util.GuiceConfig;
 import ai.BoardEvaluator;
 import ai.StandardBoardEvaluator;
-import client.Client;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -34,16 +26,21 @@ public final class EvaluatorCompetition<T extends BoardEvaluator> {
   
   private final List<T> boardEvaluators = new ArrayList<>();
   
-  private final ExecutorService executorService = Executors.newCachedThreadPool();
+  private final HeadlessServer headlessServer;
+  
+  private final ClientGroup clientGroup;
   
   /**
-   * @param boardEvaluators the list of boardEvaluators that are supposed to compete against each
-   * other. The number of BoardEvaluators must be between 1 and 4.
+   * @param boardEvaluators the collection of boardEvaluators that are supposed to compete against
+   * each other. The number of BoardEvaluators must be between 1 and 4.
    */
   public EvaluatorCompetition(Collection<T> boardEvaluators) {
     Preconditions.checkArgument(0 < boardEvaluators.size() && boardEvaluators.size() <= 4,
         "Only 1-4 Evaluators may compete.");
     this.boardEvaluators.addAll(boardEvaluators);
+    Injector injector = Guice.createInjector(new CompetitionManagerConfig());
+    headlessServer = injector.getInstance(HeadlessServer.class);
+    clientGroup = injector.getInstance(ClientGroup.class);
   }
   
   /**
@@ -61,74 +58,21 @@ public final class EvaluatorCompetition<T extends BoardEvaluator> {
    * of BoardEvaluators must be between 1 and 4.
    */
   public void replaceAllEvaluators(Collection<T> boardEvaluators) {
-    Preconditions.checkArgument(0 < boardEvaluators.size() && boardEvaluators.size() <= 4,
+    checkArgument(0 < boardEvaluators.size() && boardEvaluators.size() <= 4,
         "Only 1-4 Evaluators may compete.");
     this.boardEvaluators.clear();
     this.boardEvaluators.addAll(boardEvaluators);
   }
   
   /**
-   * Runs a single game on a headless server (no UI visible). The server is started and torn down
-   * internally. The BoardEvaluators participate in a random order.
+   * Shuffles the participating evaluators and then runs a single game
    * 
-   * @return the winning BoardEvaluator
+   * @return the BoardEvaluator that won the game
    */
   public T runCompetition() {
-    Game game = startGame();
-    T winner = runClients();
-    game.stopGame();
-    return winner;
-  }
-  
-  /**
-   * @return the running game which should be stopped via {@link Game#stopGame()} when no longer
-   * running.
-   */
-  private Game startGame() {
-    Game game = new Game();
-    game.setUserinterface(new MockUI());
-    String playerArg = "-n" + boardEvaluators.size();
-    game.parsArgs(new String[] { playerArg });
-    executorService.submit(game::run);
-    return game;
-  }
-  
-  /**
-   * Shuffles the participating BoardEvaluators, runs each of them in a Client using a separate
-   * thread and waits for all Clients to finish playing before returning the winner.
-   * 
-   * @return the winning BoardEvaluator
-   */
-  private T runClients() {
     Collections.shuffle(boardEvaluators);
-    CountDownLatch countDownLatch = new CountDownLatch(boardEvaluators.size());
-    Set<T> winners = new HashSet<>();
-    for (T boardEvaluator : boardEvaluators) {
-      executorService.submit(() -> {
-        if (runEvaluator(boardEvaluator)) {
-          winners.add(boardEvaluator);
-        }
-        countDownLatch.countDown();
-      });
-    }
-    try {
-      countDownLatch.await();
-    }
-    catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-    return Iterables.getOnlyElement(winners);
-  }
-  
-  /**
-   * Launches a single Client with the given BoardEvaluator. This method should be launched in a
-   * separate Thread to avoid deadlock.
-   * 
-   * @return true if the BoardEvaluator won
-   */
-  private static boolean runEvaluator(BoardEvaluator boardEvaluator) {
-    Injector injector = Guice.createInjector(new GuiceConfig(boardEvaluator));
-    return injector.getInstance(Client.class).play();
+    headlessServer.run();
+    return clientGroup.runClients(boardEvaluators);
   }
   
   public static void main(String[] args) throws Exception {

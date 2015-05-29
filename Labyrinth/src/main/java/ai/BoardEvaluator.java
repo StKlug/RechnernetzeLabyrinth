@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
  * 
  * @author Sebastian Oberhoff
  */
+@FunctionalInterface
 public interface BoardEvaluator {
   
   /**

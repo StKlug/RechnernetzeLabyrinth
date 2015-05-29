@@ -1,4 +1,4 @@
-package util;
+package guiceconfigs;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -8,24 +8,27 @@ import javax.xml.bind.JAXBException;
 
 import jaxb.MazeCom;
 import ai.BoardEvaluator;
+import ai.StandardBoardEvaluator;
+import client.MazeComMarshaller;
+import client.MazeComUnmarshaller;
+import client.TCPMazeComMarshaller;
+import client.TCPMazeComUnmarshaller;
 
 import com.google.inject.AbstractModule;
 
 /**
- * Dependency injection configuration for Guice
+ * The standard Guice configuration for running a single Client in connection with a full fledged
+ * server via TCP.
  * 
  * @author Sebastian Oberhoff
  */
-public final class GuiceConfig extends AbstractModule {
+public class StandardClientConfig extends AbstractModule {
   
   private final Socket server;
   
   private final JAXBContext jaxbContext;
   
-  private final BoardEvaluator boardEvaluator;
-  
-  public GuiceConfig(BoardEvaluator boardEvaluator) {
-    this.boardEvaluator = boardEvaluator;
+  public StandardClientConfig() {
     try {
       server = new Socket((String) null, 5123); // see config.Settings.PORT
       jaxbContext = JAXBContext.newInstance(MazeCom.class);
@@ -37,7 +40,9 @@ public final class GuiceConfig extends AbstractModule {
   
   @Override
   public void configure() {
-    bind(BoardEvaluator.class).toInstance(boardEvaluator);
+    bind(BoardEvaluator.class).to(StandardBoardEvaluator.class);
+    bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
+    bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
     bind(Socket.class).toInstance(server);
     bind(JAXBContext.class).toInstance(jaxbContext);
   }
