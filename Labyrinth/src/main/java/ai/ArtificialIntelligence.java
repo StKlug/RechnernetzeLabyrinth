@@ -3,8 +3,12 @@ package ai;
 import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import jaxb.MoveMessageType;
-import jaxb.PositionType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import util.CurrentID;
+import util.Misc;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.Inject;
@@ -16,6 +20,8 @@ import com.google.inject.Inject;
  * @author Sebastian Oberhoff
  */
 public final class ArtificialIntelligence {
+  
+  private final Logger logger = LoggerFactory.getLogger(ArtificialIntelligence.class);
   
   private final BoardPermuter boardPermuter;
   
@@ -39,14 +45,10 @@ public final class ArtificialIntelligence {
     BoardType bestBoard =
         boardEvaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
     MoveMessageType bestMove = nextStates.get(bestBoard);
-    log(bestMove);
+    
+    logger.debug("Shift: " + Misc.printPosition(bestMove.getShiftPosition())
+        + "Player Position: " + Misc.printPosition(bestMove.getNewPinPos()));
+    
     return bestMove;
-  }
-  
-  private void log(MoveMessageType bestMove) {
-    PositionType shiftPosition = bestMove.getShiftPosition();
-    PositionType newPinPos = bestMove.getNewPinPos();
-    System.out.println("Shift: (" + shiftPosition.getRow() + ", " + shiftPosition.getCol() + ") "
-        + "Player Position: (" + newPinPos.getRow() + ", " + newPinPos.getCol() + ")");
   }
 }

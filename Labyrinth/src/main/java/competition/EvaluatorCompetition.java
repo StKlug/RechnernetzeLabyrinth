@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import ai.BoardEvaluator;
 import ai.StandardBoardEvaluator;
 
@@ -76,6 +80,9 @@ public final class EvaluatorCompetition<T extends BoardEvaluator> {
   }
   
   public static void main(String[] args) throws Exception {
+    BasicConfigurator.configure();
+    Logger.getRootLogger().setLevel(Level.INFO);
+    
     List<StandardBoardEvaluator> boardEvaluators = Lists.newArrayList(
         new StandardBoardEvaluator(),
         new StandardBoardEvaluator(),

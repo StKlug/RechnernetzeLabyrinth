@@ -7,6 +7,10 @@ import java.net.UnknownHostException;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import jaxb.MazeCom;
 import jaxb.MazeComType;
 import jaxb.MoveMessageType;
@@ -102,6 +106,8 @@ public final class Client {
    * sends the program into the run-loop.
    */
   public static void main(String[] args) throws JAXBException, UnknownHostException, IOException {
+    BasicConfigurator.configure();
+    Logger.getRootLogger().setLevel(Level.INFO);
     Injector injector = Guice.createInjector(new StandardClientConfig());
     injector.getInstance(Client.class).play();
   }

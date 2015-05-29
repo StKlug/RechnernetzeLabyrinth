@@ -3,6 +3,10 @@ package competition;
 import java.util.concurrent.BlockingQueue;
 
 import jaxb.MazeCom;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import client.MazeComUnmarshaller;
 
 import com.google.inject.Inject;
@@ -14,6 +18,8 @@ import com.google.inject.name.Named;
  * @author Sebastian Oberhoff
  */
 public class QueueMazeComUnmarshaller implements MazeComUnmarshaller {
+  
+  private final Logger logger = LoggerFactory.getLogger(QueueMazeComUnmarshaller.class);
   
   private final BlockingQueue<MazeCom> serverToClientQueue;
   
@@ -27,7 +33,7 @@ public class QueueMazeComUnmarshaller implements MazeComUnmarshaller {
   public MazeCom unmarshall() {
     try {
       MazeCom mazeCom = serverToClientQueue.take();
-      System.out.println("Client unqueueing:" + mazeCom.getMcType());
+      logger.debug("Client unqueueing:" + mazeCom.getMcType());
       return mazeCom;
     }
     catch (InterruptedException e) {

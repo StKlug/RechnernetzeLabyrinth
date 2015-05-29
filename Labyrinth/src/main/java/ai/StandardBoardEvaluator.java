@@ -9,6 +9,10 @@ import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import jaxb.PositionType;
 import jaxb.TreasureType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import util.CurrentID;
 import util.Misc;
 import util.ServerFacade;
@@ -21,6 +25,8 @@ import com.google.common.collect.ImmutableSet;
  * @author Sebastian Oberhoff
  */
 public class StandardBoardEvaluator implements BoardEvaluator {
+  
+  private final Logger logger = LoggerFactory.getLogger(StandardBoardEvaluator.class);
   
   private final Random random = new Random();
   
@@ -42,7 +48,7 @@ public class StandardBoardEvaluator implements BoardEvaluator {
       }
     }
     checkNotNull(bestBoard);
-    System.out.print("Value: " + bestScore + " ");
+    logger.debug("Value: " + bestScore);
     return bestBoard;
   }
   

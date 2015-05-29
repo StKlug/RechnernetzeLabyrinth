@@ -10,6 +10,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import jaxb.MazeCom;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import util.UTFOutputStream;
 
 import com.google.inject.Inject;
@@ -20,6 +24,8 @@ import com.google.inject.Inject;
  * @author Sebastian Oberhoff
  */
 public final class TCPMazeComMarshaller implements MazeComMarshaller {
+  
+  private final Logger logger = LoggerFactory.getLogger(TCPMazeComMarshaller.class);
   
   private final UTFOutputStream utfOutputStream;
   
@@ -42,14 +48,10 @@ public final class TCPMazeComMarshaller implements MazeComMarshaller {
       ByteArrayOutputStream outputBytes = new ByteArrayOutputStream();
       marshaller.marshal(mazeCom, outputBytes);
       utfOutputStream.writeUTF8(new String(outputBytes.toByteArray(), StandardCharsets.UTF_8));
-      log(mazeCom);
+      logger.debug("Marshalled: " + mazeCom.getMcType());
     }
     catch (JAXBException | IOException e) {
       throw new RuntimeException(e);
     }
-  }
-  
-  private void log(MazeCom mazeCom) {
-    System.out.println("Marshalled: " + mazeCom.getMcType());
   }
 }
