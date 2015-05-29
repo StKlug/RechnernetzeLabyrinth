@@ -14,6 +14,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
 
+/**
+ * Factory for creating a new batch of Player-objects for another game, reusing existing queues to
+ * communicate with clients.
+ * 
+ * @author Sebastian Oberhoff
+ */
 public class PlayerFactory {
   
   private final BlockingQueue<MazeCom> clientToServer;
@@ -28,6 +34,9 @@ public class PlayerFactory {
     this.serverToClientQueues = serverToClientQueues;
   }
   
+  /**
+   * Exchanges a new round of logins with the clients and returns the resulting Player objects.
+   */
   public ImmutableSet<Player> createPlayers(Game game) {
     Builder<Player> builder = ImmutableSet.builder();
     int playerID = 1;
@@ -41,6 +50,9 @@ public class PlayerFactory {
     return players;
   }
   
+  /**
+   * Copy-pasted from the server source code.
+   */
   private void distributeTreasures(Collection<Player> players) {
     ArrayList<TreasureType> treasureCardPile = new ArrayList<TreasureType>();
     treasureCardPile.add(TreasureType.SYM_01);

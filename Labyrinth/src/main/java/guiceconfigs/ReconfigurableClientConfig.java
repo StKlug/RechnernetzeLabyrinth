@@ -10,34 +10,37 @@ import client.MazeComUnmarshaller;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import competition.DirectMazeComMarshaller;
-import competition.DirectMazeComUnmarshaller;
+import competition.QueueMazeComMarshaller;
+import competition.QueueMazeComUnmarshaller;
 
+/**
+ * @author Sebastian Oberhoff
+ */
 public class ReconfigurableClientConfig extends AbstractModule {
   
   private final BoardEvaluator boardEvaluator;
   
-  private final BlockingQueue<MazeCom> inputQueue;
+  private final BlockingQueue<MazeCom> serverToClientQueue;
   
-  private final BlockingQueue<MazeCom> outputQueue;
+  private final BlockingQueue<MazeCom> clientToServerQueue;
   
   public ReconfigurableClientConfig(
       BoardEvaluator boardEvaluator,
-      BlockingQueue<MazeCom> inputQueue,
-      BlockingQueue<MazeCom> outputQueue) {
+      BlockingQueue<MazeCom> serverToClientQueue,
+      BlockingQueue<MazeCom> clientToServerQueue) {
     this.boardEvaluator = boardEvaluator;
-    this.inputQueue = inputQueue;
-    this.outputQueue = outputQueue;
+    this.serverToClientQueue = serverToClientQueue;
+    this.clientToServerQueue = clientToServerQueue;
   }
   
   @Override
   protected void configure() {
     bind(BoardEvaluator.class).toInstance(boardEvaluator);
-    bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).annotatedWith(Names.named("input"))
-        .toInstance(inputQueue);
-    bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).annotatedWith(Names.named("output"))
-    .toInstance(outputQueue);
-    bind(MazeComUnmarshaller.class).to(DirectMazeComUnmarshaller.class);
-    bind(MazeComMarshaller.class).to(DirectMazeComMarshaller.class);
+    bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).annotatedWith(Names.named("serverToClient"))
+        .toInstance(serverToClientQueue);
+    bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).annotatedWith(Names.named("clientToServer"))
+        .toInstance(clientToServerQueue);
+    bind(MazeComUnmarshaller.class).to(QueueMazeComUnmarshaller.class);
+    bind(MazeComMarshaller.class).to(QueueMazeComMarshaller.class);
   }
 }

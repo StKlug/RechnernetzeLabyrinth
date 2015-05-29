@@ -4,6 +4,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+/**
+ * Required to instantiate the server without actually opening a real TCP connection.
+ * 
+ * @author Sebastian Oberhoff
+ */
 public class MockSocket extends Socket {
   
   @Override

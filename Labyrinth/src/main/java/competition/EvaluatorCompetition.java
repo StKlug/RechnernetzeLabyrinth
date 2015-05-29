@@ -71,7 +71,7 @@ public final class EvaluatorCompetition<T extends BoardEvaluator> {
    */
   public T runCompetition() {
     Collections.shuffle(boardEvaluators);
-    headlessServer.run();
+    headlessServer.runGame();
     return clientGroup.runClients(boardEvaluators);
   }
   

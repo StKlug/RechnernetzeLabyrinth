@@ -10,6 +10,11 @@ import server.Player;
 
 import com.google.inject.Inject;
 
+/**
+ * A gui-less, TCP-less server for the purpose of running many consecutive games.
+ * 
+ * @author Sebastian Oberhoff
+ */
 public class HeadlessServer {
   
   private final Game game;
@@ -28,7 +33,10 @@ public class HeadlessServer {
     game.setUserinterface(new MockUI());
   }
   
-  public void run() {
+  /**
+   * Starts a single game in a new thread.
+   */
+  public void runGame() {
     executorService.submit(() -> {
       resetGame();
       runGameLoop();
@@ -43,6 +51,9 @@ public class HeadlessServer {
     injectFields(playerMap, new Board());
   }
   
+  /**
+   * Reflectively inserts the objects required to substitute TCP communication.
+   */
   private void injectFields(HashMap<Integer, Player> players, Board board) {
     try {
       Field spielerMap = Game.class.getDeclaredField("spieler");

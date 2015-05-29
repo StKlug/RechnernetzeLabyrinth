@@ -16,6 +16,12 @@ import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
+/**
+ * A group of up to four Clients that can repeatedly participate in games using the given
+ * BoardEvaluators.
+ * 
+ * @author Sebastian Oberhoff
+ */
 public class ClientGroup {
   
   private final ImmutableSet<ReconfigurableClient> clients;
@@ -34,6 +40,11 @@ public class ClientGroup {
     this.clients = builder.build();
   }
   
+  /**
+   * Runs one Client for each BoardEvaluator passed in and determines the winner.
+   * 
+   * @return the winning BoardEvaluator
+   */
   public <T extends BoardEvaluator> T runClients(Collection<T> boardEvaluators) {
     Set<T> winners = new HashSet<>();
     CountDownLatch countDownLatch = new CountDownLatch(boardEvaluators.size());
@@ -54,6 +65,7 @@ public class ClientGroup {
     catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
+    // defensive programming, there should be one and only one winner
     return Iterables.getOnlyElement(winners);
   }
 }

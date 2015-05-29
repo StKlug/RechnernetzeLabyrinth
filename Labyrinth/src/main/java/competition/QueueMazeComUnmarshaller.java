@@ -8,19 +8,25 @@ import client.MazeComUnmarshaller;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class DirectMazeComUnmarshaller implements MazeComUnmarshaller {
+/**
+ * Replaces communication via TCP by communication via a BlockingQueue.
+ * 
+ * @author Sebastian Oberhoff
+ */
+public class QueueMazeComUnmarshaller implements MazeComUnmarshaller {
   
-  private final BlockingQueue<MazeCom> inputQueue;
+  private final BlockingQueue<MazeCom> serverToClientQueue;
   
   @Inject
-  public DirectMazeComUnmarshaller(@Named("input") BlockingQueue<MazeCom> inputQueue) {
-    this.inputQueue = inputQueue;
+  public QueueMazeComUnmarshaller(
+      @Named("serverToClient") BlockingQueue<MazeCom> serverToClientQueue) {
+    this.serverToClientQueue = serverToClientQueue;
   }
   
   @Override
   public MazeCom unmarshall() {
     try {
-      MazeCom mazeCom = inputQueue.take();
+      MazeCom mazeCom = serverToClientQueue.take();
       System.out.println("Client unqueueing:" + mazeCom.getMcType());
       return mazeCom;
     }

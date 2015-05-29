@@ -10,7 +10,7 @@ import server.Game;
 import server.Player;
 
 /**
- * This class overrides the behaviour of the {@link Connection} class and facilitates communication
+ * This class overrides the behavior of the {@link Connection} class and facilitates communication
  * via BlockingQueues rather than TCP sockets.
  * 
  * @author Sebastian Oberhoff

@@ -8,20 +8,25 @@ import client.MazeComMarshaller;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class DirectMazeComMarshaller implements MazeComMarshaller {
+/**
+ * Replaces communication via TCP by communication via a BlockingQueue.
+ * 
+ * @author Sebastian Oberhoff
+ */
+public class QueueMazeComMarshaller implements MazeComMarshaller {
   
-  private final BlockingQueue<MazeCom> outputQueue;
+  private final BlockingQueue<MazeCom> clientToServerQueue;
   
   @Inject
-  public DirectMazeComMarshaller(@Named("output") BlockingQueue<MazeCom> outputQueue) {
-    this.outputQueue = outputQueue;
+  public QueueMazeComMarshaller(@Named("clientToServer") BlockingQueue<MazeCom> clientToServerQueue) {
+    this.clientToServerQueue = clientToServerQueue;
   }
   
   @Override
   public void marshall(MazeCom mazeCom) {
     try {
       System.out.println("Client queueing: " + mazeCom.getMcType());
-      outputQueue.put(mazeCom);
+      clientToServerQueue.put(mazeCom);
     }
     catch (InterruptedException e) {
       Thread.currentThread().interrupt();

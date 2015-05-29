@@ -12,6 +12,9 @@ import jaxb.MazeCom;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 
+/**
+ * @author Sebastian Oberhoff
+ */
 public final class CompetitionManagerConfig extends AbstractModule {
   
   @Override
