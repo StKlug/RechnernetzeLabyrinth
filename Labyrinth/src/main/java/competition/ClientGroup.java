@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 
 import jaxb.MazeCom;
-import ai.BoardEvaluator;
+import ai.Evaluator;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 
 /**
  * A group of up to four Clients that can repeatedly participate in games using the given
- * BoardEvaluators.
+ * Evaluators.
  * 
  * @author Sebastian Oberhoff
  */
@@ -26,13 +26,13 @@ public class ClientGroup {
   
   private final ImmutableSet<ReconfigurableClient> clients;
   
-  private final ExecutorService executorService;
+  private final Executor executor;
   
   @Inject
-  public ClientGroup(ExecutorService executorService,
+  public ClientGroup(Executor executor,
       Collection<BlockingQueue<MazeCom>> inputQueues,
       BlockingQueue<MazeCom> outputQueue) {
-    this.executorService = executorService;
+    this.executor = executor;
     Builder<ReconfigurableClient> builder = ImmutableSet.builder();
     for (BlockingQueue<MazeCom> inputQueue : inputQueues) {
       builder.add(new ReconfigurableClient(inputQueue, outputQueue));
@@ -41,20 +41,20 @@ public class ClientGroup {
   }
   
   /**
-   * Runs one Client for each BoardEvaluator passed in and determines the winner.
+   * Runs one Client for each Evaluator passed in and determines the winner.
    * 
-   * @return the winning BoardEvaluator
+   * @return the winning Evaluator
    */
-  public <T extends BoardEvaluator> T runClients(Collection<T> boardEvaluators) {
+  public <T extends Evaluator> T runClients(Collection<T> evaluators) {
     Set<T> winners = new HashSet<>();
-    CountDownLatch countDownLatch = new CountDownLatch(boardEvaluators.size());
+    CountDownLatch countDownLatch = new CountDownLatch(evaluators.size());
     Iterator<ReconfigurableClient> iterator = clients.iterator();
-    for (T boardEvaluator : boardEvaluators) {
+    for (T evaluator : evaluators) {
       ReconfigurableClient client = iterator.next();
-      client.setDelegate(boardEvaluator);
-      executorService.submit(() -> {
+      client.setDelegate(evaluator);
+      executor.execute(() -> {
         if (client.play()) {
-          winners.add(boardEvaluator);
+          winners.add(evaluator);
         }
         countDownLatch.countDown();
       });

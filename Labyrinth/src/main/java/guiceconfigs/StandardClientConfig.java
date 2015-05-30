@@ -7,8 +7,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import jaxb.MazeCom;
-import ai.BoardEvaluator;
-import ai.StandardBoardEvaluator;
+import ai.Evaluator;
+import ai.linearevaluator.LinearEvaluator;
 import client.MazeComMarshaller;
 import client.MazeComUnmarshaller;
 import client.TCPMazeComMarshaller;
@@ -40,7 +40,7 @@ public class StandardClientConfig extends AbstractModule {
   
   @Override
   public void configure() {
-    bind(BoardEvaluator.class).to(StandardBoardEvaluator.class);
+    bind(Evaluator.class).to(LinearEvaluator.class);
     bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
     bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
     bind(Socket.class).toInstance(server);

@@ -1,4 +1,4 @@
-package ai;
+package ai.linearevaluator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -16,17 +16,18 @@ import org.slf4j.LoggerFactory;
 import util.CurrentID;
 import util.Misc;
 import util.ServerFacade;
+import ai.Evaluator;
 
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Standard implementation for determining the best possible board from a set of boards.
+ * Implementation of the Evaluator interface using a linear weighted value function.
  * 
  * @author Sebastian Oberhoff
  */
-public class StandardBoardEvaluator implements BoardEvaluator {
+public class LinearEvaluator implements Evaluator {
   
-  private final Logger logger = LoggerFactory.getLogger(StandardBoardEvaluator.class);
+  private final Logger logger = LoggerFactory.getLogger(LinearEvaluator.class);
   
   private final Random random = new Random();
   

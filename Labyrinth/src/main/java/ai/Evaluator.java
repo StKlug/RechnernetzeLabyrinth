@@ -7,13 +7,13 @@ import util.CurrentID;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * A BoardEvaluator has the responsibility to find a best possible next state of the board that the
+ * A Evaluator has the responsibility to find a best possible next state of the board that the
  * AI should choose for its move.
  * 
  * @author Sebastian Oberhoff
  */
 @FunctionalInterface
-public interface BoardEvaluator {
+public interface Evaluator {
   
   /**
    * @param awaitMoveMessageType this is the relevant piece of the message that was transmitted by

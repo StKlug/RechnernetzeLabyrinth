@@ -25,17 +25,17 @@ public final class ArtificialIntelligence {
   
   private final BoardPermuter boardPermuter;
   
-  private final BoardEvaluator boardEvaluator;
+  private final Evaluator evaluator;
   
   private final CurrentID currentID;
   
   @Inject
   public ArtificialIntelligence(
       BoardPermuter boardPermuter,
-      BoardEvaluator boardEvaluator,
+      Evaluator evaluator,
       CurrentID currentID) {
     this.boardPermuter = boardPermuter;
-    this.boardEvaluator = boardEvaluator;
+    this.evaluator = evaluator;
     this.currentID = currentID;
   }
   
@@ -43,7 +43,7 @@ public final class ArtificialIntelligence {
     ImmutableBiMap<BoardType, MoveMessageType> nextStates =
         boardPermuter.createAllPossibleMoves(awaitMoveMessageType.getBoard());
     BoardType bestBoard =
-        boardEvaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
+        evaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
     MoveMessageType bestMove = nextStates.get(bestBoard);
     
     logger.debug("Shift: " + Misc.printPosition(bestMove.getShiftPosition())

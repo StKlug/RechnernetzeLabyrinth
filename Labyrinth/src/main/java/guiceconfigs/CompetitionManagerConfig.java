@@ -3,7 +3,7 @@ package guiceconfigs;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -19,7 +19,7 @@ public final class CompetitionManagerConfig extends AbstractModule {
   
   @Override
   public void configure() {
-    bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
+    bind(Executor.class).toInstance(Executors.newCachedThreadPool());
     bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).toInstance(new LinkedBlockingQueue<>());
     bind(new TypeLiteral<Collection<BlockingQueue<MazeCom>>>() {})
         .toInstance(createServerToClientQueues());

@@ -3,7 +3,7 @@ package guiceconfigs;
 import java.util.concurrent.BlockingQueue;
 
 import jaxb.MazeCom;
-import ai.BoardEvaluator;
+import ai.Evaluator;
 import client.MazeComMarshaller;
 import client.MazeComUnmarshaller;
 
@@ -18,24 +18,24 @@ import competition.QueueMazeComUnmarshaller;
  */
 public class ReconfigurableClientConfig extends AbstractModule {
   
-  private final BoardEvaluator boardEvaluator;
+  private final Evaluator evaluator;
   
   private final BlockingQueue<MazeCom> serverToClientQueue;
   
   private final BlockingQueue<MazeCom> clientToServerQueue;
   
   public ReconfigurableClientConfig(
-      BoardEvaluator boardEvaluator,
+      Evaluator evaluator,
       BlockingQueue<MazeCom> serverToClientQueue,
       BlockingQueue<MazeCom> clientToServerQueue) {
-    this.boardEvaluator = boardEvaluator;
+    this.evaluator = evaluator;
     this.serverToClientQueue = serverToClientQueue;
     this.clientToServerQueue = clientToServerQueue;
   }
   
   @Override
   protected void configure() {
-    bind(BoardEvaluator.class).toInstance(boardEvaluator);
+    bind(Evaluator.class).toInstance(evaluator);
     bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).annotatedWith(Names.named("serverToClient"))
         .toInstance(serverToClientQueue);
     bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).annotatedWith(Names.named("clientToServer"))

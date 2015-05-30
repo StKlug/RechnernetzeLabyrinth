@@ -2,11 +2,13 @@ package competition;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
+
 
 import server.Board;
 import server.Game;
 import server.Player;
+
 
 import com.google.inject.Inject;
 
@@ -19,16 +21,16 @@ public class HeadlessServer {
   
   private final Game game;
   
-  private final ExecutorService executorService;
+  private final Executor executor;
   
   private final PlayerFactory playerFactory;
   
   @Inject
   public HeadlessServer(Game game,
-      ExecutorService executorService,
+      Executor executor,
       PlayerFactory playerFactory) {
     this.game = game;
-    this.executorService = executorService;
+    this.executor = executor;
     this.playerFactory = playerFactory;
     game.setUserinterface(new MockUI());
   }
@@ -37,7 +39,7 @@ public class HeadlessServer {
    * Starts a single game in a new thread.
    */
   public void runGame() {
-    executorService.submit(() -> {
+    executor.execute(() -> {
       resetGame();
       runGameLoop();
     });
