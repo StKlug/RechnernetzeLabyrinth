@@ -1,14 +1,10 @@
 package competition;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.concurrent.Executor;
-
 
 import server.Board;
 import server.Game;
-import server.Player;
-
 
 import com.google.inject.Inject;
 
@@ -19,20 +15,14 @@ import com.google.inject.Inject;
  */
 public class HeadlessServer {
   
-  private final Game game;
-  
   private final Executor executor;
   
   private final PlayerFactory playerFactory;
   
   @Inject
-  public HeadlessServer(Game game,
-      Executor executor,
-      PlayerFactory playerFactory) {
-    this.game = game;
+  public HeadlessServer(Executor executor, PlayerFactory playerFactory) {
     this.executor = executor;
     this.playerFactory = playerFactory;
-    game.setUserinterface(new MockUI());
   }
   
   /**
@@ -40,31 +30,26 @@ public class HeadlessServer {
    */
   public void runGame() {
     executor.execute(() -> {
-      resetGame();
-      runGameLoop();
+      Game game = createNewGame();
+      runGameLoop(game);
     });
   }
   
-  private void resetGame() {
-    HashMap<Integer, Player> playerMap = new HashMap<>();
-    for (Player player : playerFactory.createPlayers(game)) {
-      playerMap.put(player.getID(), player);
-    }
-    injectFields(playerMap, new Board());
-  }
-  
   /**
-   * Reflectively inserts the objects required to substitute TCP communication.
+   * Instantiates a new game, sets a no-op GUI and reflectively inserts the objects required to
+   * substitute TCP communication.
    */
-  private void injectFields(HashMap<Integer, Player> players, Board board) {
+  private Game createNewGame() {
+    Game game = new Game();
+    game.setUserinterface(new MockUI());
     try {
       Field spielerMap = Game.class.getDeclaredField("spieler");
       spielerMap.setAccessible(true);
-      spielerMap.set(game, players);
+      spielerMap.set(game, playerFactory.createPlayerHashMap(game));
       
       Field spielBrett = Game.class.getDeclaredField("spielBrett");
       spielBrett.setAccessible(true);
-      spielBrett.set(game, board);
+      spielBrett.set(game, new Board());
       
       Field winner = Game.class.getDeclaredField("winner");
       winner.setAccessible(true);
@@ -76,9 +61,10 @@ public class HeadlessServer {
            | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
+    return game;
   }
   
-  private void runGameLoop() {
+  private void runGameLoop(Game game) {
     int currentPlayer = 1;
     while (!game.somebodyWon()) {
       game.singleTurn(currentPlayer);

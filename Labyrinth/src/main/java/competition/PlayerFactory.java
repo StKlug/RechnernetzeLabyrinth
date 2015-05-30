@@ -2,6 +2,7 @@ package competition;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
 import jaxb.MazeCom;
@@ -10,8 +11,6 @@ import networking.Connection;
 import server.Game;
 import server.Player;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
 
 /**
@@ -35,19 +34,20 @@ public class PlayerFactory {
   }
   
   /**
-   * Exchanges a new round of logins with the clients and returns the resulting Player objects.
+   * Exchanges a new round of logins with the clients and returns a HashMap from the player IDs to
+   * the player objects. The return type was chosen to be compatible with the "spieler" field in the
+   * {@link Game} class.
    */
-  public ImmutableSet<Player> createPlayers(Game game) {
-    Builder<Player> builder = ImmutableSet.builder();
+  public HashMap<Integer, Player> createPlayerHashMap(Game game) {
+    HashMap<Integer, Player> playerHashMap = new HashMap<>();
     int playerID = 1;
     for (BlockingQueue<MazeCom> outputQueue : serverToClientQueues) {
       Connection connection = new QueueConnection(game, playerID, clientToServer, outputQueue);
-      builder.add(connection.login(playerID));
+      playerHashMap.put(playerID, connection.login(playerID));
       playerID++;
     }
-    ImmutableSet<Player> players = builder.build();
-    distributeTreasures(players);
-    return players;
+    distributeTreasures(playerHashMap.values());
+    return playerHashMap;
   }
   
   /**
