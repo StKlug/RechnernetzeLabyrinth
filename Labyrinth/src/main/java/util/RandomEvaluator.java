@@ -8,7 +8,12 @@ import ai.Evaluator;
 
 import com.google.common.collect.ImmutableSet;
 
-public class RandomEvaluator implements Evaluator {
+/**
+ * Evaluator that picks a board at random. Intended for testing.
+ * 
+ * @author Sebastian Oberhoff
+ */
+public final class RandomEvaluator implements Evaluator {
   
   Random random = new Random();
   

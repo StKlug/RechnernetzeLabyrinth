@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 
 import jaxb.MazeCom;
 import ai.Evaluator;
-import ai.linearevaluator.LinearEvaluator;
+import ai.featureevaluator.Features;
 import client.MazeComMarshaller;
 import client.MazeComUnmarshaller;
 import client.TCPMazeComMarshaller;
@@ -16,13 +16,15 @@ import client.TCPMazeComUnmarshaller;
 
 import com.google.inject.AbstractModule;
 
+import competition.featureevaluator.EvolvableFeatureEvaluator;
+
 /**
  * The standard Guice configuration for running a single Client in connection with a full fledged
  * server via TCP.
  * 
  * @author Sebastian Oberhoff
  */
-public class StandardClientConfig extends AbstractModule {
+public final class StandardClientConfig extends AbstractModule {
   
   private final Socket server;
   
@@ -40,7 +42,7 @@ public class StandardClientConfig extends AbstractModule {
   
   @Override
   public void configure() {
-    bind(Evaluator.class).to(LinearEvaluator.class);
+    bind(Evaluator.class).toInstance(new EvolvableFeatureEvaluator(Features.getAllFeatures()));
     bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
     bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
     bind(Socket.class).toInstance(server);

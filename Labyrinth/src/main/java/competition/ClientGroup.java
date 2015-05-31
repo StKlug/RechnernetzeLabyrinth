@@ -22,7 +22,7 @@ import com.google.inject.Inject;
  * 
  * @author Sebastian Oberhoff
  */
-public class ClientGroup {
+public final class ClientGroup {
   
   private final ImmutableSet<ReconfigurableClient> clients;
   

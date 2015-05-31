@@ -16,7 +16,7 @@ import competition.QueueMazeComUnmarshaller;
 /**
  * @author Sebastian Oberhoff
  */
-public class ReconfigurableClientConfig extends AbstractModule {
+public final class ReconfigurableClientConfig extends AbstractModule {
   
   private final Evaluator evaluator;
   

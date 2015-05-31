@@ -11,7 +11,7 @@ import client.Client;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 
-public class ReconfigurableClient {
+public final class ReconfigurableClient {
   
   private Evaluator delegate;
   

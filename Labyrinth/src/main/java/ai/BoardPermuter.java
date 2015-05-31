@@ -8,6 +8,7 @@ import jaxb.CardType.Openings;
 import jaxb.MoveMessageType;
 import jaxb.PositionType;
 import util.CurrentID;
+import util.Loggers;
 import util.Misc;
 import util.ServerFacade;
 
@@ -55,7 +56,9 @@ public final class BoardPermuter {
         }
       }
     }
-    return builder.build();
+    ImmutableBiMap<BoardType, MoveMessageType> possibleBoardsAndMessages = builder.build();
+    Loggers.AI.debug("Permutations: " + possibleBoardsAndMessages.size());
+    return possibleBoardsAndMessages;
   }
   
   /**

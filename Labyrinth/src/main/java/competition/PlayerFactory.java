@@ -19,7 +19,7 @@ import com.google.inject.Inject;
  * 
  * @author Sebastian Oberhoff
  */
-public class PlayerFactory {
+public final class PlayerFactory {
   
   private final BlockingQueue<MazeCom> clientToServer;
   

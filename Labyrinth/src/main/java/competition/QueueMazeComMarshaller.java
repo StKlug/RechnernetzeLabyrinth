@@ -3,10 +3,7 @@ package competition;
 import java.util.concurrent.BlockingQueue;
 
 import jaxb.MazeCom;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import util.Loggers;
 import client.MazeComMarshaller;
 
 import com.google.inject.Inject;
@@ -17,9 +14,7 @@ import com.google.inject.name.Named;
  * 
  * @author Sebastian Oberhoff
  */
-public class QueueMazeComMarshaller implements MazeComMarshaller {
-  
-  private final Logger logger = LoggerFactory.getLogger(QueueMazeComMarshaller.class);
+public final class QueueMazeComMarshaller implements MazeComMarshaller {
   
   private final BlockingQueue<MazeCom> clientToServerQueue;
   
@@ -31,7 +26,7 @@ public class QueueMazeComMarshaller implements MazeComMarshaller {
   @Override
   public void marshall(MazeCom mazeCom) {
     try {
-      logger.debug("Client queueing: " + mazeCom.getMcType());
+      Loggers.COMPETITION.debug("Client queueing: " + mazeCom.getMcType());
       clientToServerQueue.put(mazeCom);
     }
     catch (InterruptedException e) {

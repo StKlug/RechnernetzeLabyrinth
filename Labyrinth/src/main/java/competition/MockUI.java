@@ -13,7 +13,7 @@ import server.userInterface.UI;
  * 
  * @author Sebastian Oberhoff
  */
-public class MockUI implements UI {
+public final class MockUI implements UI {
   
   @Override
   public void displayMove(MoveMessageType mm, Board b, long moveDelay, long shiftDelay) {

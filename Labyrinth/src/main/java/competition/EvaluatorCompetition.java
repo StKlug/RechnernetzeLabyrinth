@@ -8,15 +8,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import ai.Evaluator;
-import ai.linearevaluator.LinearEvaluator;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -77,22 +71,5 @@ public final class EvaluatorCompetition<T extends Evaluator> {
     Collections.shuffle(evaluators);
     headlessServer.runGame();
     return clientGroup.runClients(evaluators);
-  }
-  
-  public static void main(String[] args) throws Exception {
-    BasicConfigurator.configure();
-    Logger.getRootLogger().setLevel(Level.INFO);
-    
-    List<LinearEvaluator> evaluators = Lists.newArrayList(
-        new LinearEvaluator(),
-        new LinearEvaluator(),
-        new LinearEvaluator(),
-        new LinearEvaluator());
-    EvaluatorCompetition<LinearEvaluator> clientGroup =
-        new EvaluatorCompetition<>(evaluators);
-    for (int i = 0; i < 1000; i++) {
-      // TODO: Do something more productive than just printing out the winner
-      System.err.println("The winner is: " + clientGroup.runCompetition());
-    }
   }
 }

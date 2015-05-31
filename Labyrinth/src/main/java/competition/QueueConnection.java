@@ -6,12 +6,9 @@ import java.util.concurrent.CountDownLatch;
 import jaxb.MazeCom;
 import jaxb.MazeComType;
 import networking.Connection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import server.Game;
 import server.Player;
+import util.Loggers;
 
 /**
  * This class overrides the behavior of the {@link Connection} class and facilitates communication
@@ -19,9 +16,7 @@ import server.Player;
  * 
  * @author Sebastian Oberhoff
  */
-public class QueueConnection extends Connection {
-  
-  private final Logger logger = LoggerFactory.getLogger(QueueConnection.class);
+public final class QueueConnection extends Connection {
   
   private final BlockingQueue<MazeCom> inputQueue;
   
@@ -42,7 +37,7 @@ public class QueueConnection extends Connection {
   @Override
   public void sendMessage(MazeCom mc, boolean withTimer) {
     try {
-      logger.debug("Server queueing: " + mc.getMcType());
+      Loggers.COMPETITION.debug("Server queueing: " + mc.getMcType());
       outputQueue.put(mc);
     }
     catch (InterruptedException e) {
@@ -54,7 +49,7 @@ public class QueueConnection extends Connection {
   public MazeCom receiveMessage() {
     try {
       MazeCom mazeCom = inputQueue.take();
-      logger.debug("Server unqueueing: " + mazeCom.getMcType());
+      Loggers.COMPETITION.debug("Server unqueueing: " + mazeCom.getMcType());
       // Logins get unqueued by the class LoginThread. This block communicates to the HeadlessServer
       // thread that the client has responded.
       if (mazeCom.getMcType() == MazeComType.LOGIN) {

@@ -9,7 +9,7 @@ import java.net.Socket;
  * 
  * @author Sebastian Oberhoff
  */
-public class MockSocket extends Socket {
+public final class MockSocket extends Socket {
   
   @Override
   public InputStream getInputStream() {

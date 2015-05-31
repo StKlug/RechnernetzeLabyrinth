@@ -13,7 +13,7 @@ import com.google.inject.Inject;
  * 
  * @author Sebastian Oberhoff
  */
-public class HeadlessServer {
+public final class HeadlessServer {
   
   private final Executor executor;
   
