@@ -22,6 +22,9 @@ import com.google.inject.Inject;
  * considers all 4 rotations of the shift card, all 12 possible insertion points minus the insertion
  * point forbidden by the previous move, as well as all reachable positions by the player pin after
  * the shift has been applied.
+ * <p>
+ * The result is guaranteed to be exact, meaning that no legal moves are missing and no illegal
+ * moves are included.
  * 
  * @author Sebastian Oberhoff
  */

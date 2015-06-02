@@ -10,6 +10,12 @@ import util.Loggers;
 import util.Misc;
 import util.ServerFacade;
 
+/**
+ * Computes the distance from the player position to the current target treasure in the Manhattan
+ * norm (row distance + column distance).
+ * 
+ * @author Sebastian Oberhoff
+ */
 public final class DistanceToTreasure implements Feature {
   
   @Override

@@ -15,7 +15,7 @@ import util.UTFInputStream;
 import com.google.inject.Inject;
 
 /**
- * Listens to the connection to the server and unmarshalls any incoming MazeComs.
+ * Implementation of the {@link MazeComUnmarshaller} interface using TCP.
  * 
  * @author Sebastian Oberhoff
  */

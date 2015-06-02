@@ -17,6 +17,15 @@ public class RunEvolution {
   public static void main(String[] args) {
     EvaluatorCompetition<EvolvableFeatureEvaluator> competition =
         new EvaluatorCompetition<>(createNextGeneration(createFirstEvaluator()));
+    multipleElimination(competition);
+  }
+  
+  private static void multipleElimination(
+      EvaluatorCompetition<EvolvableFeatureEvaluator> competition) {
+    System.out.println(competition.runCompetition(100));
+  }
+  
+  private static void singleElimination(EvaluatorCompetition<EvolvableFeatureEvaluator> competition) {
     for (int i = 1; i <= 1000; i++) {
       EvolvableFeatureEvaluator winner = competition.runCompetition();
       Loggers.EVOLUTION.info("Winner: " + winner);
@@ -26,16 +35,17 @@ public class RunEvolution {
   }
   
   private static Set<EvolvableFeatureEvaluator> createNextGeneration(
-      EvolvableFeatureEvaluator parent) {
-    Set<EvolvableFeatureEvaluator> children = new HashSet<>();
-    for (int j = 1; j <= 4; j++) {
-      EvolvableFeatureEvaluator child = parent.copy();
-      child.evolve(5);
-      children.add(child);
+      EvolvableFeatureEvaluator winner) {
+    Set<EvolvableFeatureEvaluator> nextGeneration = new HashSet<>();
+    nextGeneration.add(winner);
+    for (int j = 1; j <= 3; j++) {
+      EvolvableFeatureEvaluator newCompetitor = winner.copy();
+      newCompetitor.evolve(5);
+      nextGeneration.add(newCompetitor);
     }
     Loggers.EVOLUTION.info("Next generation: "
-        + children.stream().map(Object::toString).reduce(String::concat).orElse(""));
-    return children;
+        + nextGeneration.stream().map(Object::toString).reduce(String::concat).orElse(""));
+    return nextGeneration;
   }
   
   private static EvolvableFeatureEvaluator createFirstEvaluator() {

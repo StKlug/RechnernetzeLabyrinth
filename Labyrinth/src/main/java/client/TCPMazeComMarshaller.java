@@ -16,7 +16,7 @@ import util.UTFOutputStream;
 import com.google.inject.Inject;
 
 /**
- * Sends MazeComs back to the server.
+ * Implementation of the {@link MazeComMarshaller} interface using TCP.
  * 
  * @author Sebastian Oberhoff
  */

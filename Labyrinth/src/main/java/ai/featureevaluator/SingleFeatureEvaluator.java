@@ -14,6 +14,16 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
+ * Evaluates every possible board with the same single {@link Feature} and returns the board with
+ * the highest {@link Feature#measure} as the winner. Ties are broken with a random number
+ * generator. (This has proven useful in training, since otherwise AI's would often get stuck
+ * because they kept picking a move that didn't change the player position).
+ * <p>
+ * Note that even though this class only explicitly evaluates a single Feature, that Feature might
+ * call multiple other Features behind the scene via the <a
+ * href="http://en.wikipedia.org/wiki/Composite_pattern">Composite pattern</a> or other forms of
+ * delegation.
+ * 
  * @author Sebastian Oberhoff
  */
 public final class SingleFeatureEvaluator implements Evaluator {
@@ -40,7 +50,7 @@ public final class SingleFeatureEvaluator implements Evaluator {
       }
     }
     BoardType bestBoard = Iterables.get(bestBoards, random.nextInt(bestBoards.size()));
-    Loggers.AI.debug("Number of best boards: "+ bestBoards.size() + " Score: " + bestScore);
+    Loggers.AI.debug("Number of best boards: " + bestBoards.size() + " Score: " + bestScore);
     return bestBoard;
   }
 }

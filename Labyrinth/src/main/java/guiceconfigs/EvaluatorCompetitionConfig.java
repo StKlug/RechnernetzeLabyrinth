@@ -15,7 +15,7 @@ import com.google.inject.TypeLiteral;
 /**
  * @author Sebastian Oberhoff
  */
-public final class CompetitionManagerConfig extends AbstractModule {
+public final class EvaluatorCompetitionConfig extends AbstractModule {
   
   @Override
   public void configure() {

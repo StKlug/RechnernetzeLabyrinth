@@ -2,6 +2,11 @@ package client;
 
 import jaxb.MazeCom;
 
+/**
+ * Responsible for receiving MazeCom objects from the server and handing them to the client.
+ * 
+ * @author Sebastian Oberhoff
+ */
 @FunctionalInterface
 public interface MazeComUnmarshaller {
   

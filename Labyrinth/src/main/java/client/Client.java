@@ -19,15 +19,15 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 /**
- * The central class of the program, containing both the main-method as well as the while-loop that
- * keeps the program running.
+ * The root of the module responsible for a single player, containing both the standard main-method
+ * for playing via TCP as well as the while-loop that keeps the client running.
  * 
  * @author Sebastian Oberhoff
  */
 public final class Client {
   
   private static enum Status {
-    RUNNING, LOST, WON;
+    PLAYING, LOST, WON;
   }
   
   private Status status;
@@ -61,9 +61,9 @@ public final class Client {
    * @return true if the client won the game
    */
   public boolean play() {
-    status = Status.RUNNING;
+    status = Status.PLAYING;
     mazeComMarshaller.marshall(mazeComFactory.createLoginMessage("Ameisen"));
-    while (status == Status.RUNNING) {
+    while (status == Status.PLAYING) {
       MazeCom mazeCom = mazeComUnmarshaller.unmarshall();
       dispatch(mazeCom);
     }

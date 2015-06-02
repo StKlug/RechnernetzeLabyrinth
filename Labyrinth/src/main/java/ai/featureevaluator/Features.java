@@ -3,6 +3,11 @@ package ai.featureevaluator;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 
+/**
+ * Helper functions related to the {@link Feature} interface.
+ * 
+ * @author Sebastian Oberhoff
+ */
 public final class Features {
   
   private Features() {
