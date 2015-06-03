@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Optional;
 
 import jaxb.BoardType;
+import jaxb.CardType;
 import jaxb.MoveMessageType;
 import jaxb.PositionType;
 import jaxb.TreasureType;
@@ -27,10 +28,20 @@ public final class ServerFacade {
    * Applies a MoveMessageType to a BoardType and returns the resulting BoardType. This operation
    * doesn't change the old board.
    */
-  public static BoardType convertMessageToBoardType(BoardType oldBoard,
-      MoveMessageType moveMessageType) {
+  public static BoardType applyMessageToBoard(BoardType oldBoard,
+      MoveMessageType moveMessageType, int id) {
     Board board = new Board(oldBoard);
-    board.proceedShift(moveMessageType);
+    board.proceedTurn(moveMessageType, id);
+    return board;
+  }
+  
+  public static BoardType applyShiftToBoard(BoardType oldBoard, CardType shiftCard,
+      PositionType shiftPosition) {
+    Board board = new Board(oldBoard);
+    MoveMessageType shiftMessage = new MoveMessageType();
+    shiftMessage.setShiftCard(shiftCard);
+    shiftMessage.setShiftPosition(shiftPosition);
+    board.proceedShift(shiftMessage);
     return board;
   }
   

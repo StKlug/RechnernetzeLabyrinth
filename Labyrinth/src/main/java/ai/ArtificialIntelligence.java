@@ -3,7 +3,9 @@ package ai;
 import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import jaxb.MoveMessageType;
-import jaxb.PositionType;
+import util.CurrentID;
+import util.Loggers;
+import util.Misc;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.Inject;
@@ -18,27 +20,30 @@ public final class ArtificialIntelligence {
   
   private final BoardPermuter boardPermuter;
   
-  private final BoardEvaluator boardEvaluator;
+  private final Evaluator evaluator;
+  
+  private final CurrentID currentID;
   
   @Inject
-  public ArtificialIntelligence(BoardPermuter boardPermuter, BoardEvaluator boardEvaluator) {
+  public ArtificialIntelligence(
+      BoardPermuter boardPermuter,
+      Evaluator evaluator,
+      CurrentID currentID) {
     this.boardPermuter = boardPermuter;
-    this.boardEvaluator = boardEvaluator;
+    this.evaluator = evaluator;
+    this.currentID = currentID;
   }
   
   public MoveMessageType computeMove(AwaitMoveMessageType awaitMoveMessageType) {
-    ImmutableBiMap<BoardType, MoveMessageType> nextStates = boardPermuter
-        .createAllPossibleMoves(awaitMoveMessageType.getBoard());
-    BoardType bestBoard = boardEvaluator.findBest(awaitMoveMessageType, nextStates.keySet());
+    ImmutableBiMap<BoardType, MoveMessageType> nextStates =
+        boardPermuter.createAllPossibleMoves(awaitMoveMessageType.getBoard());
+    BoardType bestBoard =
+        evaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
     MoveMessageType bestMove = nextStates.get(bestBoard);
-    log(bestMove);
+    
+    Loggers.AI.debug("Shift: " + Misc.printPosition(bestMove.getShiftPosition())
+        + ", Player Position: " + Misc.printPosition(bestMove.getNewPinPos()));
+    
     return bestMove;
-  }
-  
-  private void log(MoveMessageType bestMove) {
-    PositionType shiftPosition = bestMove.getShiftPosition();
-    PositionType newPinPos = bestMove.getNewPinPos();
-    System.out.println("Shift: (" + shiftPosition.getRow() + ", " + shiftPosition.getCol() + ") "
-        + "Player Position: (" + newPinPos.getRow() + ", " + newPinPos.getCol() + ")");
   }
 }
