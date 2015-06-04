@@ -19,38 +19,40 @@ import com.google.common.collect.Iterables;
  * generator. (This has proven useful in training, since otherwise AI's would often get stuck
  * because they kept picking a move that didn't change the player position).
  * <p>
- * Note that even though this class only explicitly evaluates a single Feature, that Feature might
- * call multiple other Features behind the scene via the <a
- * href="http://en.wikipedia.org/wiki/Composite_pattern">Composite pattern</a> or other forms of
- * delegation.
+ * Note that even though this class only explicitly evaluates a single Feature, that Feature might call multiple other
+ * Features behind the scene via the <a href="http://en.wikipedia.org/wiki/Composite_pattern">Composite pattern</a> or
+ * other forms of delegation.
  * 
  * @author Sebastian Oberhoff
  */
-public final class SingleFeatureEvaluator implements Evaluator {
-  
-  private final Random random = new Random();
-  
-  private final Feature feature;
-  
-  public SingleFeatureEvaluator(Feature feature) {
-    this.feature = feature;
-  }
-  
-  @Override
-  public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType,
-      ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID) {
-    Set<BoardType> bestBoards = new HashSet<>();
-    int bestScore = Integer.MIN_VALUE;
-    
-    for (BoardType possibleBoardType : possibleBoardTypes) {
-      int score = feature.measure(awaitMoveMessageType, possibleBoardType, currentID);
-      if (bestScore <= score) {
-        bestBoards.add(possibleBoardType);
-        bestScore = score;
-      }
+public final class SingleFeatureEvaluator implements Evaluator
+{
+    private final Random random = new Random();
+
+    private final Feature feature;
+
+    public SingleFeatureEvaluator(Feature feature)
+    {
+        this.feature = feature;
     }
-    BoardType bestBoard = Iterables.get(bestBoards, random.nextInt(bestBoards.size()));
-    Loggers.AI.debug("Number of best boards: " + bestBoards.size() + " Score: " + bestScore);
-    return bestBoard;
-  }
+
+    @Override
+    public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID)
+    {
+        Set<BoardType> bestBoards = new HashSet<>();
+        int bestScore = Integer.MIN_VALUE;
+
+        for (BoardType possibleBoardType : possibleBoardTypes)
+        {
+            int score = feature.measure(awaitMoveMessageType, possibleBoardType, currentID);
+            if (bestScore <= score)
+            {
+                bestBoards.add(possibleBoardType);
+                bestScore = score;
+            }
+        }
+        BoardType bestBoard = Iterables.get(bestBoards, random.nextInt(bestBoards.size()));
+        Loggers.AI.debug("Number of best boards: " + bestBoards.size() + " Score: " + bestScore);
+        return bestBoard;
+    }
 }

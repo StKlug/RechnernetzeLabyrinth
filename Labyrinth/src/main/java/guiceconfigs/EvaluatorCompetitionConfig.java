@@ -15,21 +15,25 @@ import com.google.inject.TypeLiteral;
 /**
  * @author Sebastian Oberhoff
  */
-public final class EvaluatorCompetitionConfig extends AbstractModule {
-  
-  @Override
-  public void configure() {
-    bind(Executor.class).toInstance(Executors.newCachedThreadPool());
-    bind(new TypeLiteral<BlockingQueue<MazeCom>>() {}).toInstance(new LinkedBlockingQueue<>());
-    bind(new TypeLiteral<Collection<BlockingQueue<MazeCom>>>() {})
-        .toInstance(createServerToClientQueues());
-  }
-  
-  private Collection<BlockingQueue<MazeCom>> createServerToClientQueues() {
-    Collection<BlockingQueue<MazeCom>> serverToClientQueues = new ArrayList<>();
-    for (int numberOfPlayers = 1; numberOfPlayers <= 4; numberOfPlayers++) {
-      serverToClientQueues.add(new LinkedBlockingQueue<>());
+public final class EvaluatorCompetitionConfig extends AbstractModule
+{
+    @Override
+    public void configure()
+    {
+        bind(Executor.class).toInstance(Executors.newCachedThreadPool());
+        bind(new TypeLiteral<BlockingQueue<MazeCom>>()
+        {}).toInstance(new LinkedBlockingQueue<>());
+        bind(new TypeLiteral<Collection<BlockingQueue<MazeCom>>>()
+        {}).toInstance(createServerToClientQueues());
     }
-    return serverToClientQueues;
-  }
+
+    private Collection<BlockingQueue<MazeCom>> createServerToClientQueues()
+    {
+        Collection<BlockingQueue<MazeCom>> serverToClientQueues = new ArrayList<>();
+        for (int numberOfPlayers = 1; numberOfPlayers <= 4; numberOfPlayers++)
+        {
+            serverToClientQueues.add(new LinkedBlockingQueue<>());
+        }
+        return serverToClientQueues;
+    }
 }

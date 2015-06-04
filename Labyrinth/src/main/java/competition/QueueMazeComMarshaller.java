@@ -14,24 +14,27 @@ import com.google.inject.name.Named;
  * 
  * @author Sebastian Oberhoff
  */
-public final class QueueMazeComMarshaller implements MazeComMarshaller {
-  
-  private final BlockingQueue<MazeCom> clientToServerQueue;
-  
-  @Inject
-  public QueueMazeComMarshaller(@Named("clientToServer") BlockingQueue<MazeCom> clientToServerQueue) {
-    this.clientToServerQueue = clientToServerQueue;
-  }
-  
-  @Override
-  public void marshall(MazeCom mazeCom) {
-    try {
-      Loggers.COMPETITION.debug("Client queueing: " + mazeCom.getMcType());
-      clientToServerQueue.put(mazeCom);
+public final class QueueMazeComMarshaller implements MazeComMarshaller
+{
+    private final BlockingQueue<MazeCom> clientToServerQueue;
+
+    @Inject
+    public QueueMazeComMarshaller(@Named("clientToServer") BlockingQueue<MazeCom> clientToServerQueue)
+    {
+        this.clientToServerQueue = clientToServerQueue;
     }
-    catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
+
+    @Override
+    public void marshall(MazeCom mazeCom)
+    {
+        try
+        {
+            Loggers.COMPETITION.debug("Client queueing: " + mazeCom.getMcType());
+            clientToServerQueue.put(mazeCom);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
-  }
-  
 }

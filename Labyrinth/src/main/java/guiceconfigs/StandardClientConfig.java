@@ -24,28 +24,32 @@ import competition.featureevaluator.EvolvableFeatureEvaluator;
  * 
  * @author Sebastian Oberhoff
  */
-public final class StandardClientConfig extends AbstractModule {
-  
-  private final Socket server;
-  
-  private final JAXBContext jaxbContext;
-  
-  public StandardClientConfig() {
-    try {
-      server = new Socket((String) null, 5123); // see config.Settings.PORT
-      jaxbContext = JAXBContext.newInstance(MazeCom.class);
+public final class StandardClientConfig extends AbstractModule
+{
+    private final Socket server;
+
+    private final JAXBContext jaxbContext;
+
+    public StandardClientConfig()
+    {
+        try
+        {
+            server = new Socket((String) null, 5123); // see config.Settings.PORT
+            jaxbContext = JAXBContext.newInstance(MazeCom.class);
+        }
+        catch (IOException | JAXBException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-    catch (IOException | JAXBException e) {
-      throw new RuntimeException(e);
+
+    @Override
+    public void configure()
+    {
+        bind(Evaluator.class).toInstance(new EvolvableFeatureEvaluator(Features.getAllFeatures()));
+        bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
+        bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
+        bind(Socket.class).toInstance(server);
+        bind(JAXBContext.class).toInstance(jaxbContext);
     }
-  }
-  
-  @Override
-  public void configure() {
-    bind(Evaluator.class).toInstance(new EvolvableFeatureEvaluator(Features.getAllFeatures()));
-    bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
-    bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
-    bind(Socket.class).toInstance(server);
-    bind(JAXBContext.class).toInstance(jaxbContext);
-  }
 }

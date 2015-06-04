@@ -16,34 +16,30 @@ import com.google.inject.Inject;
  * 
  * @author Sebastian Oberhoff
  */
-public final class ArtificialIntelligence {
-  
-  private final BoardPermuter boardPermuter;
-  
-  private final Evaluator evaluator;
-  
-  private final CurrentID currentID;
-  
-  @Inject
-  public ArtificialIntelligence(
-      BoardPermuter boardPermuter,
-      Evaluator evaluator,
-      CurrentID currentID) {
-    this.boardPermuter = boardPermuter;
-    this.evaluator = evaluator;
-    this.currentID = currentID;
-  }
-  
-  public MoveMessageType computeMove(AwaitMoveMessageType awaitMoveMessageType) {
-    ImmutableBiMap<BoardType, MoveMessageType> nextStates =
-        boardPermuter.createAllPossibleMoves(awaitMoveMessageType.getBoard());
-    BoardType bestBoard =
-        evaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
-    MoveMessageType bestMove = nextStates.get(bestBoard);
-    
-    Loggers.AI.debug("Shift: " + Misc.printPosition(bestMove.getShiftPosition())
-        + ", Player Position: " + Misc.printPosition(bestMove.getNewPinPos()));
-    
-    return bestMove;
-  }
+public final class ArtificialIntelligence
+{
+    private final BoardPermuter boardPermuter;
+
+    private final Evaluator evaluator;
+
+    private final CurrentID currentID;
+
+    @Inject
+    public ArtificialIntelligence(BoardPermuter boardPermuter, Evaluator evaluator, CurrentID currentID)
+    {
+        this.boardPermuter = boardPermuter;
+        this.evaluator = evaluator;
+        this.currentID = currentID;
+    }
+
+    public MoveMessageType computeMove(AwaitMoveMessageType awaitMoveMessageType)
+    {
+        ImmutableBiMap<BoardType, MoveMessageType> nextStates = boardPermuter.createAllPossibleMoves(awaitMoveMessageType.getBoard());
+        BoardType bestBoard = evaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
+        MoveMessageType bestMove = nextStates.get(bestBoard);
+
+        Loggers.AI.debug("Shift: " + Misc.printPosition(bestMove.getShiftPosition()) + ", Player Position: " + Misc.printPosition(bestMove.getNewPinPos()));
+
+        return bestMove;
+    }
 }

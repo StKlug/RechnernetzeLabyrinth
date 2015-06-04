@@ -9,26 +9,31 @@ import java.net.Socket;
  * 
  * @author Sebastian Oberhoff
  */
-public final class MockSocket extends Socket {
-  
-  @Override
-  public InputStream getInputStream() {
-    return new InputStream() {
-      
-      @Override
-      public int read() {
-        return 0;
-      }
-    };
-  }
-  
-  @Override
-  public OutputStream getOutputStream() {
-    return new OutputStream() {
-      
-      @Override
-      public void write(int b) {
-      }
-    };
-  }
+public final class MockSocket extends Socket
+{
+    @Override
+    public InputStream getInputStream()
+    {
+        return new InputStream()
+        {
+
+            @Override
+            public int read()
+            {
+                return 0;
+            }
+        };
+    }
+
+    @Override
+    public OutputStream getOutputStream()
+    {
+        return new OutputStream()
+        {
+            @Override
+            public void write(int b)
+            {
+            }
+        };
+    }
 }

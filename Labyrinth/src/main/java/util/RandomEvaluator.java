@@ -13,14 +13,13 @@ import com.google.common.collect.ImmutableSet;
  * 
  * @author Sebastian Oberhoff
  */
-public final class RandomEvaluator implements Evaluator {
-  
-  Random random = new Random();
-  
-  @Override
-  public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType,
-      ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID) {
-    return possibleBoardTypes.asList().get(random.nextInt(possibleBoardTypes.size()));
-  }
-  
+public final class RandomEvaluator implements Evaluator
+{
+    Random random = new Random();
+
+    @Override
+    public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID)
+    {
+        return possibleBoardTypes.asList().get(random.nextInt(possibleBoardTypes.size()));
+    }
 }

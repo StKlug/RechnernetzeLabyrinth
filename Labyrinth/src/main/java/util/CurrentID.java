@@ -10,16 +10,17 @@ import com.google.inject.Singleton;
  * @author Sebastian Oberhoff
  */
 @Singleton
-public final class CurrentID {
-  
-  private int currentID;
-  
-  public void update(LoginReplyMessageType loginReplyMessageType) {
-    this.currentID = loginReplyMessageType.getNewID();
-  }
-  
-  public int getCurrentID() {
-    return currentID;
-  }
-  
+public final class CurrentID
+{
+    private int currentID;
+
+    public void update(LoginReplyMessageType loginReplyMessageType)
+    {
+        this.currentID = loginReplyMessageType.getNewID();
+    }
+
+    public int getCurrentID()
+    {
+        return currentID;
+    }
 }

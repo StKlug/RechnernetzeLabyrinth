@@ -22,50 +22,55 @@ import com.google.inject.Inject;
  * 
  * @author Sebastian Oberhoff
  */
-public final class ClientGroup {
-  
-  private final ImmutableSet<ReconfigurableClient> clients;
-  
-  private final Executor executor;
-  
-  @Inject
-  public ClientGroup(Executor executor,
-      Collection<BlockingQueue<MazeCom>> inputQueues,
-      BlockingQueue<MazeCom> outputQueue) {
-    this.executor = executor;
-    Builder<ReconfigurableClient> builder = ImmutableSet.builder();
-    for (BlockingQueue<MazeCom> inputQueue : inputQueues) {
-      builder.add(new ReconfigurableClient(inputQueue, outputQueue));
-    }
-    this.clients = builder.build();
-  }
-  
-  /**
-   * Runs one Client for each Evaluator passed in and determines the winner.
-   * 
-   * @return the winning Evaluator
-   */
-  public <T extends Evaluator> T runClients(Collection<T> evaluators) {
-    Set<T> winners = new HashSet<>();
-    CountDownLatch countDownLatch = new CountDownLatch(evaluators.size());
-    Iterator<ReconfigurableClient> iterator = clients.iterator();
-    for (T evaluator : evaluators) {
-      ReconfigurableClient client = iterator.next();
-      client.setDelegate(evaluator);
-      executor.execute(() -> {
-        if (client.play()) {
-          winners.add(evaluator);
+public final class ClientGroup
+{
+    private final ImmutableSet<ReconfigurableClient> clients;
+
+    private final Executor executor;
+
+    @Inject
+    public ClientGroup(Executor executor, Collection<BlockingQueue<MazeCom>> inputQueues, BlockingQueue<MazeCom> outputQueue)
+    {
+        this.executor = executor;
+        Builder<ReconfigurableClient> builder = ImmutableSet.builder();
+        for (BlockingQueue<MazeCom> inputQueue : inputQueues)
+        {
+            builder.add(new ReconfigurableClient(inputQueue, outputQueue));
         }
-        countDownLatch.countDown();
-      });
+        this.clients = builder.build();
     }
-    try {
-      countDownLatch.await();
+
+    /**
+     * Runs one Client for each Evaluator passed in and determines the winner.
+     * 
+     * @return the winning Evaluator
+     */
+    public <T extends Evaluator> T runClients(Collection<T> evaluators)
+    {
+        Set<T> winners = new HashSet<>();
+        CountDownLatch countDownLatch = new CountDownLatch(evaluators.size());
+        Iterator<ReconfigurableClient> iterator = clients.iterator();
+        for (T evaluator : evaluators)
+        {
+            ReconfigurableClient client = iterator.next();
+            client.setDelegate(evaluator);
+            executor.execute(() -> {
+                if (client.play())
+                {
+                    winners.add(evaluator);
+                }
+                countDownLatch.countDown();
+            });
+        }
+        try
+        {
+            countDownLatch.await();
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+        // defensive programming, there should be one and only one winner
+        return Iterables.getOnlyElement(winners);
     }
-    catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-    // defensive programming, there should be one and only one winner
-    return Iterables.getOnlyElement(winners);
-  }
 }

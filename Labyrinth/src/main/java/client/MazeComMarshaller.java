@@ -8,12 +8,12 @@ import jaxb.MazeCom;
  * @author Sebastian Oberhoff
  */
 @FunctionalInterface
-public interface MazeComMarshaller {
-  
-  /**
-   * Marshalls a single MazeCom. This method doesn't block until the server accepts the message, but
-   * rather returns immediately after placing the MazeCom into some kind of shared data structure
-   * (TCP stream or BlockingQueue).
-   */
-  void marshall(MazeCom mazeCom);
+public interface MazeComMarshaller
+{
+    /**
+     * Marshalls a single MazeCom. This method doesn't block until the server accepts the message, but
+     * rather returns immediately after placing the MazeCom into some kind of shared data structure
+     * (TCP stream or BlockingQueue).
+     */
+    void marshall(MazeCom mazeCom);
 }

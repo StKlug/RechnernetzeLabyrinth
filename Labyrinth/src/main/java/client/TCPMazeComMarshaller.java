@@ -20,33 +20,39 @@ import com.google.inject.Inject;
  * 
  * @author Sebastian Oberhoff
  */
-public final class TCPMazeComMarshaller implements MazeComMarshaller {
-  
-  private final UTFOutputStream utfOutputStream;
-  
-  private final Marshaller marshaller;
-  
-  @Inject
-  public TCPMazeComMarshaller(Socket server, JAXBContext jaxbContext) {
-    try {
-      this.utfOutputStream = new UTFOutputStream(server.getOutputStream());
-      this.marshaller = jaxbContext.createMarshaller();
+public final class TCPMazeComMarshaller implements MazeComMarshaller
+{
+    private final UTFOutputStream utfOutputStream;
+
+    private final Marshaller marshaller;
+
+    @Inject
+    public TCPMazeComMarshaller(Socket server, JAXBContext jaxbContext)
+    {
+        try
+        {
+            this.utfOutputStream = new UTFOutputStream(server.getOutputStream());
+            this.marshaller = jaxbContext.createMarshaller();
+        }
+        catch (JAXBException | IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-    catch (JAXBException | IOException e) {
-      throw new RuntimeException(e);
+
+    @Override
+    public void marshall(MazeCom mazeCom)
+    {
+        try
+        {
+            ByteArrayOutputStream outputBytes = new ByteArrayOutputStream();
+            marshaller.marshal(mazeCom, outputBytes);
+            utfOutputStream.writeUTF8(new String(outputBytes.toByteArray(), StandardCharsets.UTF_8));
+            Loggers.TCP.debug("Marshalled: " + mazeCom.getMcType());
+        }
+        catch (JAXBException | IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-  }
-  
-  @Override
-  public void marshall(MazeCom mazeCom) {
-    try {
-      ByteArrayOutputStream outputBytes = new ByteArrayOutputStream();
-      marshaller.marshal(mazeCom, outputBytes);
-      utfOutputStream.writeUTF8(new String(outputBytes.toByteArray(), StandardCharsets.UTF_8));
-      Loggers.TCP.debug("Marshalled: " + mazeCom.getMcType());
-    }
-    catch (JAXBException | IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 }

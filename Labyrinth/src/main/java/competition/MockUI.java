@@ -13,25 +13,30 @@ import server.userInterface.UI;
  * 
  * @author Sebastian Oberhoff
  */
-public final class MockUI implements UI {
-  
-  @Override
-  public void displayMove(MoveMessageType mm, Board b, long moveDelay, long shiftDelay) {
-  }
-  
-  @Override
-  public void updatePlayerStatistics(List<Player> stats, Integer current) {
-  }
-  
-  @Override
-  public void init(Board b) {
-  }
-  
-  @Override
-  public void setGame(Game g) {
-  }
-  
-  @Override
-  public void gameEnded(Player winner) {
-  }
+public final class MockUI implements UI
+{
+    @Override
+    public void displayMove(MoveMessageType mm, Board b, long moveDelay, long shiftDelay)
+    {
+    }
+
+    @Override
+    public void updatePlayerStatistics(List<Player> stats, Integer current)
+    {
+    }
+
+    @Override
+    public void init(Board b)
+    {
+    }
+
+    @Override
+    public void setGame(Game g)
+    {
+    }
+
+    @Override
+    public void gameEnded(Player winner)
+    {
+    }
 }
