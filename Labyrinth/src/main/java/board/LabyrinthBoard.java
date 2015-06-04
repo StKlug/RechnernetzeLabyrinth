@@ -224,6 +224,14 @@ public class LabyrinthBoard
         return ret;
     }
 
+    /**
+     * @return all positions, which can be reached from p; if p isn't null, it is present in the returned Set
+     */
+    public Set<Point> reachablePositions(Point p)
+    {
+        return p == null ? new HashSet<Point>() : reachablePositions(p.x, p.y);
+    }
+
     @Override
     public String toString()
     {

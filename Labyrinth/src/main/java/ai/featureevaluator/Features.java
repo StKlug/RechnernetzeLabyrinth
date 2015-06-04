@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet.Builder;
 /**
  * Helper functions related to the {@link Feature} interface.
  * 
- * @author Sebastian Oberhoff
+ * @author Sebastian Oberhoff, Stefan Klug
  */
 public final class Features
 {
@@ -20,6 +20,8 @@ public final class Features
         Builder<Feature> builder = ImmutableSet.builder();
         builder.add(new DistanceToTreasure());
         builder.add(new IsStandingOnTreasure());
+        builder.add(new TreasureConnectivity());
+        builder.add(new PlayerConnectivity());
         return builder.build();
     }
 }

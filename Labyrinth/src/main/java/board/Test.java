@@ -8,6 +8,7 @@ public class Test
     {
         LabyrinthBoard b = new LabyrinthBoard(new Board());
         System.out.println(b.toString());
+        System.out.println("Erreichbare Felder von (0,0):");
         System.out.println(b.reachablePositions(0, 0));
     }
 }
