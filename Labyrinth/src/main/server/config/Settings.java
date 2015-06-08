@@ -19,11 +19,11 @@ public class Settings {
 	 * Die Zeit in Milisekunden, die die Animation eines Zug (die Bewegung des
 	 * Pins) benoetigen soll
 	 */
-	public final static int MOVEDELAY = 1;
+	public final static int MOVEDELAY = 100;
 	/**
 	 * Die Zeit in Milisekunden, die das Einschieben der Shiftcard dauern soll
 	 */
-	public final static int SHIFTDELAY = 1;
+	public final static int SHIFTDELAY = 100;
 	/**
 	 * Die Zeit in Milisekunden, nach der ein Logintimeout eintritt LOGINTIMEOUT
 	 * = 60000 entspricht einer Minute
