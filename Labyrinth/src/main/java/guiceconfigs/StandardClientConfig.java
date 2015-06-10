@@ -35,7 +35,7 @@ public final class StandardClientConfig extends AbstractModule
     {
         try
         {
-            server = new Socket((String) "192.168.43.119"/*null*/, 5123); // see config.Settings.PORT
+            server = new Socket((String) null, 5123); // see config.Settings.PORT
             jaxbContext = JAXBContext.newInstance(MazeCom.class);
         }
         catch (IOException | JAXBException e)
@@ -47,7 +47,8 @@ public final class StandardClientConfig extends AbstractModule
     @Override
     public void configure()
     {
-        bind(Evaluator.class).toInstance(new HierarchicFeatureEvaluator());//new EvolvableFeatureEvaluator(Features.getAllFeatures()));
+        bind(Evaluator.class).toInstance(new HierarchicFeatureEvaluator());// new
+                                                                           // EvolvableFeatureEvaluator(Features.getAllFeatures()));
         bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
         bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
         bind(Socket.class).toInstance(server);

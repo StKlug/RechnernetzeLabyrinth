@@ -1,17 +1,14 @@
 package ai.featureevaluator;
 
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import util.CurrentID;
-import util.Loggers;
 import ai.Evaluator;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableSet.Builder;
 
 /**
  * Evaluates every possible board with the same single {@link Feature} and returns the board with
@@ -23,13 +20,12 @@ import com.google.common.collect.Iterables;
  * Features behind the scene via the <a href="http://en.wikipedia.org/wiki/Composite_pattern">Composite pattern</a> or
  * other forms of delegation.
  * 
- * @author Sebastian Oberhoff
+ * @author Sebastian Oberhoff, Stefan Klug
  */
 public final class SingleFeatureEvaluator implements Evaluator
 {
-    private final Random random = new Random();
-
     private final Feature feature;
+    private Random random = new Random();
 
     public SingleFeatureEvaluator(Feature feature)
     {
@@ -39,20 +35,33 @@ public final class SingleFeatureEvaluator implements Evaluator
     @Override
     public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID)
     {
-        Set<BoardType> bestBoards = new HashSet<>();
-        int bestScore = Integer.MIN_VALUE;
-
-        for (BoardType possibleBoardType : possibleBoardTypes)
+        ImmutableSet<BoardType> bests = findBests(awaitMoveMessageType, possibleBoardTypes, currentID);
+        int index = random.nextInt(bests.size());
+        for (BoardType best : bests)
         {
-            int score = feature.measure(awaitMoveMessageType, possibleBoardType, currentID);
-            if (bestScore <= score)
+            if (index == 0) { return best; }
+        }
+        return null; // Compiler-Dummy, which cannot be reached
+    }
+
+    public ImmutableSet<BoardType> findBests(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID)
+    {
+        Builder<BoardType> builder = ImmutableSet.builder();
+        int evalBest = Integer.MIN_VALUE;
+        for (BoardType possibleBoard : possibleBoardTypes)
+        {
+            int eval = feature.measure(awaitMoveMessageType, possibleBoard, currentID);
+            if (eval == evalBest)
             {
-                bestBoards.add(possibleBoardType);
-                bestScore = score;
+                builder.add(possibleBoard);
+            }
+            else if (eval > evalBest)
+            {
+                builder = ImmutableSet.builder();
+                evalBest = eval;
+                builder.add(possibleBoard);
             }
         }
-        BoardType bestBoard = Iterables.get(bestBoards, random.nextInt(bestBoards.size()));
-        Loggers.AI.debug("Number of best boards: " + bestBoards.size() + " Score: " + bestScore);
-        return bestBoard;
+        return builder.build();
     }
 }
