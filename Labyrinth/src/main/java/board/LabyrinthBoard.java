@@ -78,15 +78,17 @@ public class LabyrinthBoard
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x+1,y); otherwise false
+     * @return true, if you can move directly from (row,column) to (row+1,column); otherwise false
      */
-    public boolean canGoDown(int x, int y)
+    public boolean canGoDown(int row, int column)
     {
-        return isCorrectIndex(x, y) && x != ROW_COUNT - 1 && isBitSet(this.cards[x][y], INDEX_DOWN) && isBitSet(this.cards[x + 1][y], INDEX_UP);
+        return isCorrectIndex(row, column) && row != ROW_COUNT - 1 && isBitSet(this.cards[row][column], INDEX_DOWN) && isBitSet(this.cards[row + 1][column], INDEX_UP);
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x+1,y); otherwise false
+     * x=row, y=column
+     * 
+     * @return true, if you can move directly from (row,column) to (row+1,column); otherwise false
      */
     public boolean canGoDown(Point p)
     {
@@ -94,15 +96,17 @@ public class LabyrinthBoard
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x,y-1); otherwise false
+     * @return true, if you can move directly from (row,column) to (row,column-1); otherwise false
      */
-    public boolean canGoLeft(int x, int y)
+    public boolean canGoLeft(int row, int column)
     {
-        return isCorrectIndex(x, y) && y != 0 && isBitSet(this.cards[x][y], INDEX_LEFT) && isBitSet(this.cards[x][y - 1], INDEX_RIGHT);
+        return isCorrectIndex(row, column) && column != 0 && isBitSet(this.cards[row][column], INDEX_LEFT) && isBitSet(this.cards[row][column - 1], INDEX_RIGHT);
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x,y-1); otherwise false
+     * x=row, y=column
+     * 
+     * @return true, if you can move directly from (row,column) to (row,column-1); otherwise false
      */
     public boolean canGoLeft(Point p)
     {
@@ -110,7 +114,7 @@ public class LabyrinthBoard
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x,y+1); otherwise false
+     * @return true, if you can move directly from (row,column) to (row,column+1); otherwise false
      */
     public boolean canGoRight(int x, int y)
     {
@@ -118,7 +122,9 @@ public class LabyrinthBoard
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x,y+1); otherwise false
+     * x=row, y=column
+     * 
+     * @return true, if you can move directly from (row,column) to (row,column+1); otherwise false
      */
     public boolean canGoRight(Point p)
     {
@@ -126,15 +132,17 @@ public class LabyrinthBoard
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x-1,y); otherwise false
+     * @return true, if you can move directly from (row,column) to (row-1,column); otherwise false
      */
-    public boolean canGoUp(int x, int y)
+    public boolean canGoUp(int row, int column)
     {
-        return isCorrectIndex(x, y) && x != 0 && isBitSet(this.cards[x][y], INDEX_UP) && isBitSet(this.cards[x - 1][y], INDEX_DOWN);
+        return isCorrectIndex(row, column) && row != 0 && isBitSet(this.cards[row][column], INDEX_UP) && isBitSet(this.cards[row - 1][column], INDEX_DOWN);
     }
 
     /**
-     * @return true, if you can move directly from (x,y) to (x-1,y); otherwise false
+     * x=row, y=column
+     * 
+     * @return true, if you can move directly from (row,column) to (row-1,column); otherwise false
      */
     public boolean canGoUp(Point p)
     {
@@ -142,7 +150,7 @@ public class LabyrinthBoard
     }
 
     /**
-     * @return the position, where the shift card must not be inserted
+     * @return the position, where the shift card must not be inserted (x=row, y=column)
      */
     public Point getForbidden()
     {

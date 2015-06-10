@@ -1,7 +1,5 @@
 package competition.featureevaluator;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import jaxb.AwaitMoveMessageType;

@@ -40,6 +40,7 @@ public final class SingleFeatureEvaluator implements Evaluator
         for (BoardType best : bests)
         {
             if (index == 0) { return best; }
+            index--;
         }
         return null; // Compiler-Dummy, which cannot be reached
     }
