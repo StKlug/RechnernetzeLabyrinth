@@ -17,7 +17,7 @@ public class RunEvolution
     public static void main(String[] args)
     {
         EvaluatorCompetition<EvolvableFeatureEvaluator> competition = new EvaluatorCompetition<>(createNextGeneration(createFirstEvaluator()));
-        multipleElimination(competition);
+        singleElimination(competition);
     }
 
     private static void multipleElimination(EvaluatorCompetition<EvolvableFeatureEvaluator> competition)
