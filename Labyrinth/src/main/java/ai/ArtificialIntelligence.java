@@ -1,11 +1,14 @@
 package ai;
 
+import java.awt.Point;
+
 import jaxb.AwaitMoveMessageType;
 import jaxb.BoardType;
 import jaxb.MoveMessageType;
 import util.CurrentID;
 import util.Loggers;
 import util.Misc;
+import board.LabyrinthBoard;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.Inject;
@@ -24,6 +27,8 @@ public final class ArtificialIntelligence
 
     private final CurrentID currentID;
 
+    private int foundTreasures = 0;
+
     @Inject
     public ArtificialIntelligence(BoardPermuter boardPermuter, Evaluator evaluator, CurrentID currentID)
     {
@@ -38,8 +43,21 @@ public final class ArtificialIntelligence
         BoardType bestBoard = evaluator.findBest(awaitMoveMessageType, nextStates.keySet(), currentID);
         MoveMessageType bestMove = nextStates.get(bestBoard);
 
+        LabyrinthBoard newBoard = new LabyrinthBoard(bestBoard);
+        Point posTreasure = newBoard.getPosition(awaitMoveMessageType.getTreasure());
+        Point posPlayer = newBoard.getPosition(this.currentID.getCurrentID());
+        if (posPlayer.equals(posTreasure))
+        {
+            this.foundTreasures++;
+        }
+
         Loggers.AI.debug("Shift: " + Misc.printPosition(bestMove.getShiftPosition()) + ", Player Position: " + Misc.printPosition(bestMove.getNewPinPos()));
 
         return bestMove;
+    }
+
+    public int getFoundTreasures()
+    {
+        return this.foundTreasures;
     }
 }

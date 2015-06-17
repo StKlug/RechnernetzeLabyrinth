@@ -55,6 +55,11 @@ public final class Client
         this.currentID = currentID;
     }
 
+    public int getFoundTreasures()
+    {
+        return this.artificialIntelligence.getFoundTreasures();
+    }
+
     /**
      * Logs into the server, then keeps unmarshalling new incoming messages.
      * 
