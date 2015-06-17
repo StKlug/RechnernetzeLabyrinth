@@ -8,9 +8,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import networking.UTFInputStream;
 import jaxb.MazeCom;
 import util.Loggers;
-import util.UTFInputStream;
 
 import com.google.inject.Inject;
 
