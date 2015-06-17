@@ -2,10 +2,7 @@ package guiceconfigs;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 import jaxb.MazeCom;
 
@@ -20,7 +17,7 @@ public final class EvaluatorCompetitionConfig extends AbstractModule
     @Override
     public void configure()
     {
-        bind(Executor.class).toInstance(Executors.newCachedThreadPool());
+        bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
         bind(new TypeLiteral<BlockingQueue<MazeCom>>()
         {}).toInstance(new LinkedBlockingQueue<>());
         bind(new TypeLiteral<Collection<BlockingQueue<MazeCom>>>()

@@ -27,9 +27,6 @@ public interface Feature
      *            this is the relevant piece of the message that was transmitted by
      *            the server. It contains such information as the current state of the board, the currently
      *            sought treasure and a list of remaining treasures.
-     * @param possibleBoardTypes
-     *            the set of possible future board states. This set may not contain any
-     *            illegal moves.
      * @param currentID
      *            the current ID of the player
      * @return an int representation of the board
