@@ -1,14 +1,22 @@
 package networking;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import jaxb.MazeCom;
+
+import org.xml.sax.SAXException;
+
 import tools.Debug;
 import tools.DebugLevel;
 
@@ -16,11 +24,26 @@ public class XmlInStream extends UTFInputStream {
 
 	private Unmarshaller unmarshaller;
 
+	@SuppressWarnings("nls")
 	public XmlInStream(InputStream in) {
 		super(in);
 		try {
-			JAXBContext jc = JAXBContext.newInstance(MazeCom.class);
-			this.unmarshaller = jc.createUnmarshaller();
+			JAXBContext jaxbContext = JAXBContext.newInstance(MazeCom.class);
+			unmarshaller = jaxbContext.createUnmarshaller();
+
+			SchemaFactory schemaFactory = SchemaFactory
+					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			try {
+				File xsdFile = new File(getClass().getResource(
+						"/XSD/mazeCom.xsd").getPath());
+				Schema schema = schemaFactory.newSchema(xsdFile);
+				unmarshaller.setSchema(schema);
+			} catch (SAXException e) {
+				e.printStackTrace();
+				Debug.print(
+						"[Warning] InStream: XML Schema failed => XML Validation disabled",
+						DebugLevel.DEFAULT);
+			}
 		} catch (JAXBException e) {
 			Debug.print(Messages
 					.getString("XmlInStream.errorInitialisingJAXBComponent"), //$NON-NLS-1$
@@ -34,7 +57,7 @@ public class XmlInStream extends UTFInputStream {
 	 * @return
 	 * @throws IOException
 	 */
-	public MazeCom readMazeCom() throws IOException {
+	public MazeCom readMazeCom() throws IOException, UnmarshalException{
 		byte[] bytes = null;
 		MazeCom result = null;
 		try {
@@ -44,9 +67,10 @@ public class XmlInStream extends UTFInputStream {
 			Debug.print(xml, DebugLevel.DEBUG);
 			bytes = xml.getBytes();
 			ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-
 			result = (MazeCom) this.unmarshaller.unmarshal(bais);
-		} catch (JAXBException e) {
+		}catch(UnmarshalException e){
+			throw e;
+		}catch (JAXBException e) {
 			e.printStackTrace();
 			Debug.print(Messages.getString("XmlInStream.errorUnmarshalling"), //$NON-NLS-1$
 					DebugLevel.DEFAULT);

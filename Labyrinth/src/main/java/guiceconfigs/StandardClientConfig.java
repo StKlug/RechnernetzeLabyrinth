@@ -8,7 +8,6 @@ import javax.xml.bind.JAXBException;
 
 import jaxb.MazeCom;
 import ai.Evaluator;
-import ai.featureevaluator.Features;
 import client.MazeComMarshaller;
 import client.MazeComUnmarshaller;
 import client.TCPMazeComMarshaller;
@@ -16,7 +15,6 @@ import client.TCPMazeComUnmarshaller;
 
 import com.google.inject.AbstractModule;
 
-import competition.featureevaluator.EvolvableFeatureEvaluator;
 import competition.featureevaluator.HierarchicFeatureEvaluator;
 
 /**

@@ -14,10 +14,9 @@ public interface UI {
 	// Integer eine Wartezeit von abgerundet 24 Tagen zulassen. Ist meiner
 	// Meinung ausreichend ;) ~jago
 	public void displayMove(MoveMessageType mm, Board b, long moveDelay,
-			long shiftDelay);
+			long shiftDelay, boolean treasureReached);
 
 	public void updatePlayerStatistics(List<Player> stats, Integer current);
-
 	public void init(Board b);
 	public void setGame(Game g);
 	public void gameEnded(Player winner);

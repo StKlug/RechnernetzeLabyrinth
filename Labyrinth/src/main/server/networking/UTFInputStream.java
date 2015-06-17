@@ -3,6 +3,8 @@ package networking;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class UTFInputStream {
 
@@ -13,18 +15,10 @@ public class UTFInputStream {
 	}
 
 	public String readUTF8() throws IOException {
-		byte[] tmp = this.readNBytes(4);
-		int len = 0;
-		len |= (tmp[3] & 0xff);
-		len <<= 8;
-		len |= (tmp[2] & 0xff);
-		len <<= 8;
-		len |= (tmp[1] & 0xff);
-		len <<= 8;
-		len |= (tmp[0] & 0xff);
-		byte[] bytes = this.readNBytes(len);
-		String message = new String(bytes, "UTF-8"); //$NON-NLS-1$
-		return message;
+		ByteBuffer bf = ByteBuffer.wrap(this.readNBytes(4));
+		bf.order(ByteOrder.BIG_ENDIAN); // Java always use hostorder. See javadoc
+		byte[] bytes = this.readNBytes(bf.getInt(0));
+		return new String(bytes, "UTF-8"); //$NON-NLS-1$
 	}
 
 	public void close() throws IOException {
@@ -41,10 +35,9 @@ public class UTFInputStream {
 		while (readcount < n) {
 			lastreadcount = this.is.read(buf, readcount, n - readcount);
 			if (lastreadcount == -1) {
-				throw new EOFException(
-						String.format(
-								Messages.getString("UTFInputStream.EOFException"), //$NON-NLS-1$
-								readcount, n));
+				throw new EOFException(String.format(
+						Messages.getString("UTFInputStream.EOFException"), //$NON-NLS-1$
+						readcount, n));
 			}
 			readcount += lastreadcount;
 

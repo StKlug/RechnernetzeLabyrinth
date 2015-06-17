@@ -38,6 +38,7 @@ public class Game extends Thread {
 	private Integer winner = -1;
 	private UI userinterface;
 	private int playerCount;
+	private List<TreasureType> foundTreasures;
 
 	public Game() {
 		Debug.addDebugger(System.out, Settings.DEBUGLEVEL);
@@ -45,6 +46,7 @@ public class Game extends Thread {
 		winner = -1;
 		spieler = new HashMap<Integer, Player>();
 		timeOutManager = new TimeOutManager();
+		foundTreasures = new ArrayList<TreasureType>();
 	}
 
 	/**
@@ -188,12 +190,16 @@ public class Game extends Thread {
 				DebugLevel.VERBOSE);
 		Debug.print(spielBrett.toString(), DebugLevel.DEBUG);
 		MoveMessageType move = spieler.get(currPlayer).getConToClient()
-				.awaitMove(spieler, this.spielBrett, 0);
+				.awaitMove(spieler, this.spielBrett, 0, foundTreasures);
+		boolean found=false;
 		if (move != null) {
+			//proceedTurn gibt zurueck ob der Spieler seinen Schatz erreicht hat
 			if (spielBrett.proceedTurn(move, currPlayer)) {
+				found=true;
 				Debug.print(
 						String.format(
 								Messages.getString("Game.foundTreasure"), spieler.get(currPlayer).getName(), currPlayer), DebugLevel.DEFAULT); //$NON-NLS-1$
+				foundTreasures.add(t);
 				// foundTreasure gibt zurueck wieviele
 				// Schaetze noch zu finden sind
 				if (spieler.get(currPlayer).foundTreasure() == 0) {
@@ -201,8 +207,7 @@ public class Game extends Thread {
 				}
 			}
 			userinterface.displayMove(move, spielBrett, Settings.MOVEDELAY,
-					Settings.SHIFTDELAY);
-
+					Settings.SHIFTDELAY,found);
 		} else {
 			Debug.print(
 					Messages.getString("Game.gotNoMove"), DebugLevel.DEFAULT); //$NON-NLS-1$

@@ -2,7 +2,6 @@ package competition;
 
 import java.util.List;
 
-import jaxb.MoveMessageType;
 import server.Board;
 import server.Game;
 import server.Player;
@@ -15,11 +14,6 @@ import server.userInterface.UI;
  */
 public final class MockUI implements UI
 {
-    @Override
-    public void displayMove(MoveMessageType mm, Board b, long moveDelay, long shiftDelay)
-    {
-    }
-
     @Override
     public void updatePlayerStatistics(List<Player> stats, Integer current)
     {
@@ -37,6 +31,11 @@ public final class MockUI implements UI
 
     @Override
     public void gameEnded(Player winner)
+    {
+    }
+
+    @Override
+    public void displayMove(jaxb.MoveMessageType mm, Board b, long moveDelay, long shiftDelay, boolean treasureReached)
     {
     }
 }

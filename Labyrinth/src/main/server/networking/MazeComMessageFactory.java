@@ -1,12 +1,13 @@
 package networking;
 
-
 import java.util.HashMap;
+import java.util.List;
 
 import jaxb.ErrorType;
 import jaxb.MazeCom;
 import jaxb.MazeComType;
 import jaxb.ObjectFactory;
+import jaxb.TreasureType;
 import jaxb.TreasuresToGoType;
 import jaxb.WinMessageType.Winner;
 import server.Board;
@@ -49,32 +50,35 @@ public class MazeComMessageFactory {
 		return mc;
 	}
 
-	public MazeCom createDisconnectMessage(int playerID, String name, ErrorType et) {
+	public MazeCom createDisconnectMessage(int playerID, String name,
+			ErrorType et) {
 		MazeCom mc = of.createMazeCom();
 		mc.setMcType(MazeComType.DISCONNECT);
 		mc.setId(playerID);
 		mc.setDisconnectMessage(of.createDisconnectMessageType());
-		mc.getDisconnectMessage().setErroCode(et);
+		mc.getDisconnectMessage().setErrorCode(et);
 		mc.getDisconnectMessage().setName(name);
 		return mc;
 	}
 
-
-	public MazeCom createAwaitMoveMessage(HashMap<Integer,Player> Player,Integer currPlayer, Board brett) {
+	public MazeCom createAwaitMoveMessage(HashMap<Integer, Player> Player,
+			Integer currPlayer, Board brett, List<TreasureType> foundTreasures) {
 		MazeCom mc = of.createMazeCom();
 		mc.setMcType(MazeComType.AWAITMOVE);
 		mc.setId(Player.get(currPlayer).getID());
 		mc.setAwaitMoveMessage(of.createAwaitMoveMessageType());
 		// Brett uebergeben
 		mc.getAwaitMoveMessage().setBoard(brett);
-		mc.getAwaitMoveMessage().setTreasure(Player.get(currPlayer).getCurrentTreasure());
-		for(Integer playerID : Player.keySet()){
-			TreasuresToGoType ttg=of.createTreasuresToGoType();
+		mc.getAwaitMoveMessage().setTreasure(
+				Player.get(currPlayer).getCurrentTreasure());
+		mc.getAwaitMoveMessage().getFoundTreasures().addAll(foundTreasures);
+		for (Integer playerID : Player.keySet()) {
+			TreasuresToGoType ttg = of.createTreasuresToGoType();
 			ttg.setPlayer(playerID);
 			ttg.setTreasures(Player.get(playerID).treasuresToGo());
 			mc.getAwaitMoveMessage().getTreasuresToGo().add(ttg);
 		}
-	
+
 		return mc;
 	}
 

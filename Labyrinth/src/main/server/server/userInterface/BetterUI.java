@@ -11,13 +11,9 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -35,9 +31,9 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import jaxb.BoardType.Row;
 import jaxb.CardType;
 import jaxb.MoveMessageType;
+import jaxb.BoardType.Row;
 import server.Board;
 import server.Card;
 import server.Game;
@@ -73,25 +69,6 @@ public class BetterUI extends JFrame implements UI {
 	public GraphicalCardBuffered shiftCard;
 	private StreamToTextArea log;
 
-	private static class ImageRessources {
-		private static HashMap<String, Image> images = new HashMap<String, Image>();
-
-		public static Image getImage(String name) {
-			if (images.containsKey(name)) {
-				return images.get(name);
-			}
-			URL u = ImageRessources.class.getResource(Settings.IMAGEPATH + name
-					+ Settings.IMAGEFILEEXTENSION);
-			Image img = null;
-			try {
-				img = ImageIO.read(u);
-				images.put(name, img);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return img;
-		}
-	}
 
 	private class UIBoard extends JPanel {
 		Board board;
@@ -111,10 +88,10 @@ public class BetterUI extends JFrame implements UI {
 				for (CardType ct : r.getCol()) {
 					Card card = new Card(ct);
 					c[y][x] = card;
-					images[y][x] = ImageRessources.getImage(card.getShape()
+					images[y][x] = ImageResources.getImage(card.getShape()
 							.toString() + card.getOrientation().value());
 					if (c[y][x].getTreasure() != null) {
-						ImageRessources.getImage(c[y][x].getTreasure().value());
+						ImageResources.getImage(c[y][x].getTreasure().value());
 					}
 					x++;
 				}
@@ -156,43 +133,44 @@ public class BetterUI extends JFrame implements UI {
 					if (c[y][x] != null) {
 
 						if (c[y][x].getTreasure() != null) {
-							g.drawImage(ImageRessources.getImage(c[y][x]
+							g.drawImage(ImageResources.getImage(c[y][x]
 									.getTreasure().value()), topLeftX
 									+ pixelsPerField / 4, topLeftY
 									+ pixelsPerField / 4, pixelsPerField / 2,
 									pixelsPerField / 2, null);
 						}
 						// Zeichnen der SpielerPins
-						for (Integer playerID : c[y][x].getPin().getPlayerID()) {
-							g.setColor(colorForPlayer(playerID));
-							g.fillOval(
-									topLeftX + pixelsPerField / 4
-											+ pixelsPerField / 4
-											* ((playerID - 1) / 2), topLeftY
-											+ pixelsPerField / 4
-											+ pixelsPerField / 4
-											* ((playerID - 1) % 2),
-									pixelsPerField / 4, pixelsPerField / 4);
 
-							g.setColor(Color.WHITE);
-							g.drawOval(
-									topLeftX + pixelsPerField / 4
-											+ pixelsPerField / 4
-											* ((playerID - 1) / 2), topLeftY
-											+ pixelsPerField / 4
-											+ pixelsPerField / 4
-											* ((playerID - 1) % 2),
-									pixelsPerField / 4, pixelsPerField / 4);
-							centerStringInRect((Graphics2D) g,
-									playerID.toString(), topLeftX
-											+ pixelsPerField / 4
-											+ pixelsPerField / 4
-											* ((playerID - 1) / 2), topLeftY
-											+ pixelsPerField / 4
-											+ pixelsPerField / 4
-											* ((playerID - 1) % 2),
-									pixelsPerField / 4, pixelsPerField / 4);
+						List<Integer> pins = c[y][x].getPin().getPlayerID();
+						synchronized (pins) {
+							for (Integer playerID : pins) {
+								g.setColor(colorForPlayer(playerID));
+								g.fillOval(topLeftX + pixelsPerField / 4
+										+ pixelsPerField / 4
+										* ((playerID - 1) / 2), topLeftY
+										+ pixelsPerField / 4 + pixelsPerField
+										/ 4 * ((playerID - 1) % 2),
+										pixelsPerField / 4, pixelsPerField / 4);
+
+								g.setColor(Color.WHITE);
+								g.drawOval(topLeftX + pixelsPerField / 4
+										+ pixelsPerField / 4
+										* ((playerID - 1) / 2), topLeftY
+										+ pixelsPerField / 4 + pixelsPerField
+										/ 4 * ((playerID - 1) % 2),
+										pixelsPerField / 4, pixelsPerField / 4);
+								centerStringInRect((Graphics2D) g,
+										playerID.toString(), topLeftX
+												+ pixelsPerField / 4
+												+ pixelsPerField / 4
+												* ((playerID - 1) / 2),
+										topLeftY + pixelsPerField / 4
+												+ pixelsPerField / 4
+												* ((playerID - 1) % 2),
+										pixelsPerField / 4, pixelsPerField / 4);
+							}
 						}
+
 					} else {
 						System.out
 								.println(String.format(Messages
@@ -217,11 +195,11 @@ public class BetterUI extends JFrame implements UI {
 				}
 				Card card = new Card(board.getShiftCard());
 				g.drawImage(
-						ImageRessources.getImage(card.getShape().toString()
+						ImageResources.getImage(card.getShape().toString()
 								+ card.getOrientation().value()), topLeftX,
 						topLeftY, pixelsPerField, pixelsPerField, null);
 				if (card.getTreasure() != null) {
-					g.drawImage(ImageRessources.getImage(card.getTreasure()
+					g.drawImage(ImageResources.getImage(card.getTreasure()
 							.value()), topLeftX + pixelsPerField / 4, topLeftY
 							+ pixelsPerField / 4, pixelsPerField / 2,
 							pixelsPerField / 2, null);
@@ -262,7 +240,7 @@ public class BetterUI extends JFrame implements UI {
 					statLabels.get(p.getID()).setText(
 							String.valueOf(p.treasuresToGo()));
 					treasureImages.get(p.getID()).setIcon(
-							new ImageIcon(ImageRessources.getImage(p
+							new ImageIcon(ImageResources.getImage(p
 									.getCurrentTreasure().value())));
 				}
 
@@ -292,7 +270,8 @@ public class BetterUI extends JFrame implements UI {
 					JLabel currentPlayerLabel = new JLabel();
 					currentPlayerLabels.put(p.getID(), currentPlayerLabel);
 
-					JLabel playerIDLabel = new JLabel(String.valueOf(p.getID())+".   "); //$NON-NLS-1$
+					JLabel playerIDLabel = new JLabel(String.valueOf(p.getID())
+							+ ".   "); //$NON-NLS-1$
 					JLabel playerNameLabel = new JLabel(p.getName());
 					playerNameLabel.setForeground(colorForPlayer(p.getID()));
 
@@ -301,7 +280,7 @@ public class BetterUI extends JFrame implements UI {
 					statLabels.put(p.getID(), statLabel);
 
 					JLabel treasureImage = new JLabel(new ImageIcon(
-							ImageRessources.getImage(p.getCurrentTreasure()
+							ImageResources.getImage(p.getCurrentTreasure()
 									.value())));
 					treasureImages.put(p.getID(), treasureImage);
 
@@ -638,11 +617,11 @@ public class BetterUI extends JFrame implements UI {
 
 	@Override
 	public void displayMove(MoveMessageType mm, Board b, long moveDelay,
-			long shiftDelay) {
+			long shiftDelay, boolean treasureReached) {
 		// Die Dauer von shiftDelay bezieht sich auf den kompletten Shift und
 		// nicht auf einen einzelnen Frame
 		shiftDelay /= animationFrames;
-		shiftCard.setCard(new Card(mm.getShiftCard()));
+		// shiftCard.setCard(new Card(mm.getShiftCard()));
 		if (animateShift) {
 			uiboard.board.setShiftCard(mm.getShiftCard());
 			animationTimer = new Timer((int) shiftDelay,
@@ -658,6 +637,7 @@ public class BetterUI extends JFrame implements UI {
 				}
 			}
 		}
+		shiftCard.setCard(new Card(b.getShiftCard()));
 		Position oldPlayerPos = new Position(
 				uiboard.board.findPlayer(currentPlayer));
 		uiboard.setBoard(b);
@@ -692,6 +672,10 @@ public class BetterUI extends JFrame implements UI {
 		} else {
 			uiboard.repaint();
 		}
+
+		if (treasureReached) {
+			ImageResources.treasureFound(b.getTreasure().value());
+		}
 	}
 
 	@Override
@@ -701,6 +685,7 @@ public class BetterUI extends JFrame implements UI {
 
 	@Override
 	public void init(Board b) {
+		ImageResources.reset();
 		uiboard.setBoard(b);
 		uiboard.repaint();
 		this.setVisible(true);
@@ -739,4 +724,5 @@ public class BetterUI extends JFrame implements UI {
 		MIStart.setEnabled(true);
 		MIStop.setEnabled(false);
 	}
+
 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jaxb.CardType;
-import jaxb.CardType.Openings;
-import jaxb.CardType.Pin;
 import jaxb.TreasureType;
 import tools.Debug;
 import tools.DebugLevel;

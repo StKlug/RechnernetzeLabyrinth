@@ -3,8 +3,8 @@ package networking;
 import jaxb.ErrorType;
 import jaxb.MazeCom;
 import jaxb.MazeComType;
-import server.Player;
 import config.Settings;
+import server.Player;
 
 public class LoginThread extends Thread {
 
@@ -24,7 +24,7 @@ public class LoginThread extends Thread {
 		int failCounter = 0;
 		while (failCounter < Settings.LOGINTRIES) {
 			// Test ob es sich um eine LoginNachricht handelt
-			if (loginMes.getMcType() == MazeComType.LOGIN) {
+			if (loginMes!= null && loginMes.getMcType() == MazeComType.LOGIN) {
 				// sende Reply
 				this.con.sendMessage(this.mcmf.createLoginReplyMessage(this.p
 						.getID()),false);
