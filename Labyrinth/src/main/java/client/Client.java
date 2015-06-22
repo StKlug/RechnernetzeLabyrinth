@@ -4,6 +4,7 @@ import guiceconfigs.StandardClientConfig;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 import javax.xml.bind.JAXBException;
 
@@ -117,7 +118,19 @@ public final class Client
      */
     public static void main(String[] args) throws JAXBException, UnknownHostException, IOException
     {
-        Injector injector = Guice.createInjector(new StandardClientConfig());
+        String ip;
+        if (args == null || args.length == 0)
+        {
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Geben Sie die IP-Adresse des Servers ein: ");
+            ip = sc.nextLine();
+            sc.close();
+        }
+        else
+        {
+            ip = args[0];
+        }
+        Injector injector = Guice.createInjector(new StandardClientConfig(ip));
         injector.getInstance(Client.class).play();
     }
 }

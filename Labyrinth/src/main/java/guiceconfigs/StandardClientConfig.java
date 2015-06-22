@@ -16,6 +16,7 @@ import client.TCPMazeComUnmarshaller;
 import com.google.inject.AbstractModule;
 
 import competition.featureevaluator.HierarchicFeatureEvaluator;
+import config.Settings;
 
 /**
  * The standard Guice configuration for running a single Client in connection with a full fledged
@@ -29,11 +30,14 @@ public final class StandardClientConfig extends AbstractModule
 
     private final JAXBContext jaxbContext;
 
-    public StandardClientConfig()
+    private String ip = null;
+
+    public StandardClientConfig(String ip)
     {
+        this.ip = ip;
         try
         {
-            server = new Socket((String) null, 5123); // see config.Settings.PORT
+            server = new Socket((String) ip, Settings.PORT); // see config.Settings.PORT
             jaxbContext = JAXBContext.newInstance(MazeCom.class);
         }
         catch (IOException | JAXBException e)
@@ -45,8 +49,7 @@ public final class StandardClientConfig extends AbstractModule
     @Override
     public void configure()
     {
-        bind(Evaluator.class).toInstance(new HierarchicFeatureEvaluator());// new
-                                                                           // EvolvableFeatureEvaluator(Features.getAllFeatures()));
+        bind(Evaluator.class).toInstance(new HierarchicFeatureEvaluator());
         bind(MazeComUnmarshaller.class).to(TCPMazeComUnmarshaller.class);
         bind(MazeComMarshaller.class).to(TCPMazeComMarshaller.class);
         bind(Socket.class).toInstance(server);
