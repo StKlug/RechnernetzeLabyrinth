@@ -25,10 +25,10 @@ public class LabyrinthBoard
     public static final int ROW_COUNT = 7;
     public static final int COLUMN_COUNT = 7;
 
-    private static final int INDEX_UP = 0;
-    private static final int INDEX_RIGHT = 1;
-    private static final int INDEX_DOWN = 2;
-    private static final int INDEX_LEFT = 3;
+    public static final int INDEX_UP = 0;
+    public static final int INDEX_RIGHT = 1;
+    public static final int INDEX_DOWN = 2;
+    public static final int INDEX_LEFT = 3;
 
     private int[][] cards;
     private Point forbidden;
@@ -240,6 +240,11 @@ public class LabyrinthBoard
         return p == null ? new HashSet<Point>() : reachablePositions(p.x, p.y);
     }
 
+    public int toInt(Point pos)
+    {
+        return this.cards[pos.x][pos.y];
+    }
+
     @Override
     public String toString()
     {
@@ -284,7 +289,7 @@ public class LabyrinthBoard
         return value;
     }
 
-    private boolean isBitSet(int card, int index)
+    public boolean isBitSet(int card, int index)
     {
         return (card & (1 << index)) != 0;
     }

@@ -11,7 +11,6 @@ import util.CurrentID;
 import ai.Evaluator;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 
 /**
  * Evaluates every possible board with the same single {@link Feature} and returns the board with
@@ -25,31 +24,42 @@ import com.google.common.collect.ImmutableSet.Builder;
  *
  * @author Sebastian Oberhoff, Stefan Klug
  */
-public final class SingleFeatureEvaluator implements Evaluator {
+public final class SingleFeatureEvaluator implements Evaluator
+{
+    private final Feature feature;
 
-  private final Feature feature;
+    private Random random = new Random();
 
-  private Random random = new Random();
-
-  public SingleFeatureEvaluator(Feature feature) {
-    this.feature = feature;
-  }
-
-  @Override
-  public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID) {
-    Set<BoardType> bestBoards = new HashSet<>();
-    int topScore = Integer.MIN_VALUE;
-    for (BoardType possibleBoard : possibleBoardTypes) {
-      int score = feature.measure(awaitMoveMessageType, possibleBoard, currentID);
-      if (score == topScore) {
-        bestBoards.add(possibleBoard);
-      } else if (score > topScore) {
-        bestBoards.clear();
-        topScore = score;
-        bestBoards.add(possibleBoard);
-      }
+    public SingleFeatureEvaluator(Feature feature)
+    {
+        this.feature = feature;
     }
-    return Iterables.get(bestBoards, random.nextInt(bestBoards.size()));
-  }
 
+    @Override
+    public BoardType findBest(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID)
+    {
+        Set<BoardType> bestBoards = findBests(awaitMoveMessageType, possibleBoardTypes, currentID);
+        return Iterables.get(bestBoards, random.nextInt(bestBoards.size()));
+    }
+
+    public Set<BoardType> findBests(AwaitMoveMessageType awaitMoveMessageType, ImmutableSet<BoardType> possibleBoardTypes, CurrentID currentID)
+    {
+        Set<BoardType> bestBoards = new HashSet<>();
+        int topScore = Integer.MIN_VALUE;
+        for (BoardType possibleBoard : possibleBoardTypes)
+        {
+            int score = feature.measure(awaitMoveMessageType, possibleBoard, currentID);
+            if (score == topScore)
+            {
+                bestBoards.add(possibleBoard);
+            }
+            else if (score > topScore)
+            {
+                bestBoards.clear();
+                topScore = score;
+                bestBoards.add(possibleBoard);
+            }
+        }
+        return bestBoards;
+    }
 }

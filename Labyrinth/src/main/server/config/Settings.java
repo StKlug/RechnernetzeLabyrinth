@@ -47,7 +47,7 @@ public class Settings {
 	 * Wenn TESTBOARD = true ist, dann ist das Spielbrett bei jedem Start
 	 * identisch (zum Debugging)
 	 */
-	public final static boolean TESTBOARD = true;
+	public final static boolean TESTBOARD = false;
 	/**
 	 * Hiermit lassen sich die Testfaelle anpassen (Pseudozufallszahlen)
 	 */

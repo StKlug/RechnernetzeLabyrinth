@@ -22,7 +22,7 @@ import config.Settings;
  * The standard Guice configuration for running a single Client in connection with a full fledged
  * server via TCP.
  * 
- * @author Sebastian Oberhoff
+ * @author Sebastian Oberhoff, Stefan Klug
  */
 public final class StandardClientConfig extends AbstractModule
 {
@@ -30,14 +30,11 @@ public final class StandardClientConfig extends AbstractModule
 
     private final JAXBContext jaxbContext;
 
-    private String ip = null;
-
     public StandardClientConfig(String ip)
     {
-        this.ip = ip;
         try
         {
-            server = new Socket((String) ip, Settings.PORT); // see config.Settings.PORT
+            server = new Socket(ip, Settings.PORT); // see config.Settings.PORT
             jaxbContext = JAXBContext.newInstance(MazeCom.class);
         }
         catch (IOException | JAXBException e)

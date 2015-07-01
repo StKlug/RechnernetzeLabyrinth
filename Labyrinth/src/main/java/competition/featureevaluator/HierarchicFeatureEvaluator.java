@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 
 import ai.Evaluator;
+import ai.featureevaluator.CustomDistanceToTreasure;
 import ai.featureevaluator.IsStandingOnTreasure;
 import ai.featureevaluator.PlayerConnectivity;
 import ai.featureevaluator.SingleFeatureEvaluator;
@@ -24,6 +25,7 @@ public class HierarchicFeatureEvaluator implements Evaluator
     private final IsStandingOnTreasure isStandingOnTreasure = new IsStandingOnTreasure();
     private final PlayerConnectivity playerConnectivity = new PlayerConnectivity();
     private final TreasureConnectivity treasureConnectivity = new TreasureConnectivity();
+    private final CustomDistanceToTreasure customDistance = new CustomDistanceToTreasure();
 
     private AwaitMoveMessageType awaitMoveMessageType;
     private CurrentID currentID;
@@ -37,7 +39,13 @@ public class HierarchicFeatureEvaluator implements Evaluator
         ImmutableSet<BoardType> treasureBoards = getTreasureBoards(possibleBoardTypes);
         if (treasureBoards.isEmpty())
         {
-            return new SingleFeatureEvaluator(this.playerConnectivity).findBest(awaitMoveMessageType, possibleBoardTypes, currentID);
+            Set<BoardType> bestBoards = new SingleFeatureEvaluator(this.playerConnectivity).findBests(awaitMoveMessageType, possibleBoardTypes, currentID);
+            ImmutableSet.Builder<BoardType> builder = new Builder<BoardType>();
+            for (BoardType board : bestBoards)
+            {
+                builder.add(board);
+            }
+            return new SingleFeatureEvaluator(customDistance).findBest(awaitMoveMessageType, builder.build(), currentID);
         }
         else
         {
