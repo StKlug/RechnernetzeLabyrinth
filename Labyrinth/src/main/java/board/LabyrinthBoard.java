@@ -172,7 +172,7 @@ public class LabyrinthBoard
     public Point getPosition(TreasureType treasure)
     {
         Point pos = this.treasurePositions.get(treasure);
-        return pos == null ? pos : new Point(pos);
+        return pos == null ? null : new Point(pos);
     }
 
     /**

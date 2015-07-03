@@ -69,7 +69,7 @@ public final class Client
     public boolean play()
     {
         status = Status.PLAYING;
-        mazeComMarshaller.marshall(mazeComFactory.createLoginMessage("Ameisen"));
+        mazeComMarshaller.marshall(mazeComFactory.createLoginMessage("Gandalf"));
         while (status == Status.PLAYING)
         {
             MazeCom mazeCom = mazeComUnmarshaller.unmarshall();

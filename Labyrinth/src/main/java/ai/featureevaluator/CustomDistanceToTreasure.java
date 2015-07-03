@@ -20,6 +20,29 @@ public class CustomDistanceToTreasure implements Feature
         LabyrinthBoard board = new LabyrinthBoard(boardType);
         Point playerPosition = board.getPosition(currentID.getCurrentID());
         Point treasurePosition = board.getPosition(treasure);
+        if (treasurePosition == null) // the current treasure becomes the shift card
+        {
+            int shiftCard = board.getShiftCards().iterator().next();
+            int openings = 0;
+            if (board.isBitSet(shiftCard, LabyrinthBoard.INDEX_DOWN))
+            {
+                openings++;
+            }
+            if (board.isBitSet(shiftCard, LabyrinthBoard.INDEX_LEFT))
+            {
+                openings++;
+            }
+            if (board.isBitSet(shiftCard, LabyrinthBoard.INDEX_RIGHT))
+            {
+                openings++;
+            }
+            if (board.isBitSet(shiftCard, LabyrinthBoard.INDEX_UP))
+            {
+                openings++;
+            }
+            return openings == 3 ? 0 : 3; // prefer not giving the opponent a shift card with three openings
+        }
+
         int treasureCard = board.toInt(treasurePosition);
         int eval = 0;
 
@@ -60,7 +83,7 @@ public class CustomDistanceToTreasure implements Feature
                 eval += 5; // besser
             }
         }
-        
+
         if (board.isBitSet(treasureCard, LabyrinthBoard.INDEX_LEFT))
         {
             if (playerPosition.y < treasurePosition.y)
@@ -79,7 +102,7 @@ public class CustomDistanceToTreasure implements Feature
                 eval += 5; // besser
             }
         }
-        
+
         if (board.isBitSet(treasureCard, LabyrinthBoard.INDEX_RIGHT))
         {
             if (treasurePosition.y < playerPosition.y)
